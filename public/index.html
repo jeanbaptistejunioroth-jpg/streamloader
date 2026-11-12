@@ -1,0 +1,3589 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M13 2L4.5 13.5H11L10.5 22L19.5 10.5H13L13 2Z' fill='url(%23g0)'/%3E%3Cdefs%3E%3ClinearGradient id='g0' x1='4.5' y1='2' x2='19.5' y2='22' gradientUnits='userSpaceOnUse'%3E%3Cstop stop-color='%23C4A5FF'/%3E%3Cstop offset='1' stop-color='%237B5FF5'/%3E%3C/linearGradient%3E%3C/defs%3E%3C/svg%3E">
+<title>StreamLoader Télécharge tes vidéos en un lien</title>
+<meta name="description" content="Télécharge des vidéos et de l'audio depuis YouTube, TikTok, Instagram, X, Facebook et plus de 1 000 sites. Gratuit, sans installation.">
+<meta name="theme-color" content="#F6F5F1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#212125" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..700&family=Instrument+Sans:wght@400..700&display=swap" rel="stylesheet">
+<style>
+/* ─── Reset ────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+img { display: block; max-width: 100%; }
+button, input, select { font: inherit; color: inherit; }
+
+/* ─── Tokens ───────────────────────────────────────────────────── */
+:root {
+  --font-sans: 'Instrument Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Bricolage Grotesque', 'Instrument Sans', system-ui, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', 'Segoe UI Mono', Menlo, Consolas, monospace;
+
+  --bg:          #F6F5F1;
+  --surface:     #FFFFFF;
+  --bg-2:        #EFEDE7;
+  --bg-3:        #E4E1D9;
+  --text:        #17171A;
+  --text-dim:    #4B4A52;
+  --text-muted:  #6E6C75;
+  --border:      #E2DFD7;
+  --border-2:    #CFCBC1;
+  --accent:      #7B5FF5;
+  --accent-ink:  #5A40D0;
+  --accent-soft: #EEEAFE;
+  --success:     #1E7F49;
+  --success-soft:#E2F1E7;
+  --error:       #C42B3A;
+  --error-soft:  #F9E2E4;
+  --header-bg:   rgba(246,245,241,0.86);
+  --shadow-sm:   0 1px 2px rgba(23,23,26,0.06);
+  --shadow-md:   0 1px 2px rgba(23,23,26,0.05), 0 12px 32px -16px rgba(23,23,26,0.20);
+  --shadow-lg:   0 2px 6px rgba(23,23,26,0.06), 0 32px 64px -24px rgba(23,23,26,0.32);
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --container: 1120px;
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --bg:          #212125;
+  --surface:     #2A2A2F;
+  --bg-2:        #313137;
+  --bg-3:        #3C3C43;
+  --text:        #F1F0EC;
+  --text-dim:    #C4C2C9;
+  --text-muted:  #9D9BA6;
+  --border:      #38383F;
+  --border-2:    #4A4A53;
+  --accent:      #8F7AF8;
+  --accent-ink:  #B5A7FF;
+  --accent-soft: rgba(143,122,248,0.18);
+  --success:     #52C487;
+  --success-soft:rgba(82,196,135,0.13);
+  --error:       #F2646F;
+  --error-soft:  rgba(242,100,111,0.13);
+  --header-bg:   rgba(33,33,37,0.86);
+  --shadow-sm:   0 1px 2px rgba(0,0,0,0.4);
+  --shadow-md:   0 1px 2px rgba(0,0,0,0.3), 0 14px 36px -16px rgba(0,0,0,0.65);
+  --shadow-lg:   0 32px 72px -20px rgba(0,0,0,0.75);
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:          #212125;
+    --surface:     #2A2A2F;
+    --bg-2:        #313137;
+    --bg-3:        #3C3C43;
+    --text:        #F1F0EC;
+    --text-dim:    #C4C2C9;
+    --text-muted:  #9D9BA6;
+    --border:      #38383F;
+    --border-2:    #4A4A53;
+    --accent:      #8F7AF8;
+    --accent-ink:  #B5A7FF;
+    --accent-soft: rgba(143,122,248,0.18);
+    --success:     #52C487;
+    --success-soft:rgba(82,196,135,0.13);
+    --error:       #F2646F;
+    --error-soft:  rgba(242,100,111,0.13);
+    --header-bg:   rgba(33,33,37,0.86);
+    --shadow-sm:   0 1px 2px rgba(0,0,0,0.4);
+    --shadow-md:   0 1px 2px rgba(0,0,0,0.3), 0 14px 36px -16px rgba(0,0,0,0.65);
+    --shadow-lg:   0 32px 72px -20px rgba(0,0,0,0.75);
+    color-scheme: dark;
+  }
+}
+
+/* ─── Base ─────────────────────────────────────────────────────── */
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; scroll-padding-top: 80px; }
+body {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.6;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+::selection { background: var(--accent-soft); color: var(--text); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+a { color: inherit; }
+
+/* Safari iOS zoome dès qu'un champ a une police < 16px : on garde 16px sur mobile. */
+@media (max-width: 768px) {
+  .url-widget input, .field-input, .subtitle-lang-select, .trim-field input, #premCountryPicker { font-size: 16px; }
+}
+
+/* ─── Marque ───────────────────────────────────────────────────── */
+.brand-mark { width: 24px; height: 24px; flex-shrink: 0; display: block; }
+
+/* ─── Navigation ───────────────────────────────────────────────── */
+nav {
+  position: sticky; top: 0; z-index: 900;
+  background: var(--header-bg);
+  backdrop-filter: saturate(1.4) blur(14px);
+  -webkit-backdrop-filter: saturate(1.4) blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-inner {
+  max-width: var(--container); margin: 0 auto; height: 64px; padding: 0 24px;
+  display: flex; align-items: center; gap: 28px;
+}
+.nav-logo {
+  display: inline-flex; align-items: center; gap: 10px; flex-shrink: 0;
+  color: var(--text); text-decoration: none;
+  font-family: var(--font-display); font-size: 17px; font-weight: 650; letter-spacing: -0.01em;
+}
+.nav-links { display: flex; align-items: center; gap: 2px; flex: 1; }
+.nav-links a {
+  color: var(--text-dim); font-size: 14px; font-weight: 500; text-decoration: none;
+  padding: 7px 11px; border-radius: var(--r-sm); transition: color .15s, background .15s;
+}
+.nav-links a:hover { color: var(--text); background: var(--bg-2); }
+.nav-actions { display: flex; align-items: center; gap: 4px; margin-inline-start: auto; }
+.nav-icon-btn {
+  height: 36px; min-width: 36px; padding: 0 9px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  background: transparent; border: none; border-radius: var(--r-sm);
+  color: var(--text-dim); font-size: 13px; font-weight: 600; letter-spacing: .02em;
+  cursor: pointer; transition: background .15s, color .15s;
+}
+.nav-icon-btn:hover { background: var(--bg-2); color: var(--text); }
+.nav-icon-btn svg { width: 17px; height: 17px; }
+.nav-cta {
+  height: 36px; padding: 0 16px; margin-inline-start: 6px;
+  display: inline-flex; align-items: center;
+  background: var(--text); color: var(--bg); border: none; border-radius: var(--r-sm);
+  font-size: 14px; font-weight: 600; text-decoration: none; white-space: nowrap;
+  cursor: pointer; transition: opacity .15s;
+}
+.nav-cta:hover { opacity: .86; }
+.nav-user-chip {
+  display: flex; align-items: center; gap: 8px; height: 36px; margin-inline-start: 6px;
+  padding: 0 12px 0 4px; border: 1px solid var(--border-2); border-radius: 999px;
+  background: var(--surface); color: var(--text); text-decoration: none;
+  font-size: 13.5px; font-weight: 600; cursor: pointer; transition: border-color .15s;
+  max-width: 220px;
+}
+.nav-user-chip:hover { border-color: var(--text-muted); }
+.nav-user-chip #navEmail { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nav-avatar {
+  width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+  background: var(--text); color: var(--bg);
+  display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;
+}
+.plan-badge {
+  font-size: 10.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+  color: var(--accent-ink); background: var(--accent-soft);
+  padding: 2px 7px; border-radius: 999px; flex-shrink: 0;
+}
+@media (max-width: 860px) { .nav-links { display: none; } }
+@media (max-width: 520px) {
+  .nav-inner { padding: 0 16px; gap: 12px; }
+  .nav-icon-btn .lang-ico { display: none; }
+  .nav-cta { padding: 0 13px; }
+  .nav-user-chip #navEmail { display: none; }
+}
+@media (max-width: 360px) { .nav-logo .nav-wordmark { display: none; } }
+
+/* ─── Hero ─────────────────────────────────────────────────────── */
+.hero { padding: 96px 0 88px; text-align: center; }
+.hero-inner { max-width: 880px; margin: 0 auto; padding: 0 24px; }
+.hero-title {
+  font-family: var(--font-display); font-weight: 650;
+  font-size: clamp(38px, 6.4vw, 70px); line-height: 1.03; letter-spacing: -0.035em;
+  margin-bottom: 22px; text-wrap: balance;
+}
+.hero-title span { display: block; }
+.hero-title .hl-2 { color: var(--text-muted); }
+.hero-sub {
+  font-size: clamp(16px, 1.7vw, 18px); color: var(--text-dim); line-height: 1.6;
+  max-width: 560px; margin: 0 auto 36px; text-wrap: pretty;
+}
+@media (max-width: 640px) { .hero { padding: 56px 0 64px; } .hero-inner { padding: 0 18px; } }
+
+/* ─── Champ URL ────────────────────────────────────────────────── */
+.url-widget {
+  display: flex; align-items: center; gap: 10px;
+  max-width: 640px; margin: 0 auto; padding: 7px 7px 7px 16px;
+  background: var(--surface); border: 1px solid var(--border-2); border-radius: 12px;
+  box-shadow: var(--shadow-md); transition: border-color .15s, box-shadow .15s;
+}
+.url-widget:focus-within { border-color: var(--text-muted); box-shadow: var(--shadow-md), 0 0 0 4px var(--accent-soft); }
+.url-ico { width: 18px; height: 18px; color: var(--text-muted); flex-shrink: 0; }
+.url-widget input {
+  flex: 1; min-width: 0; height: 44px; background: none; border: none; outline: none;
+  font-size: 16px; color: var(--text);
+}
+.url-widget input::placeholder { color: var(--text-muted); }
+.btn-analyze {
+  height: 44px; padding: 0 20px; flex-shrink: 0;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  background: var(--text); color: var(--bg); border: none; border-radius: 8px;
+  font-size: 15px; font-weight: 600; white-space: nowrap; cursor: pointer; transition: opacity .15s;
+}
+.btn-analyze:hover:not(:disabled) { opacity: .86; }
+.btn-analyze:disabled { opacity: .6; cursor: progress; }
+.btn-analyze svg { width: 16px; height: 16px; }
+@media (max-width: 520px) {
+  .url-widget { flex-wrap: wrap; padding: 8px 8px 8px 14px; }
+  .url-widget input { flex-basis: calc(100% - 40px); }
+  .btn-analyze { width: 100%; }
+}
+
+.site-chips {
+  display: flex; align-items: center; justify-content: center; flex-wrap: wrap;
+  gap: 8px 18px; margin-top: 24px; font-size: 13.5px; color: var(--text-muted);
+}
+.site-chips-label { font-weight: 500; }
+.site-chip { display: inline-flex; align-items: center; gap: 6px; font-weight: 500; color: var(--text-dim); }
+.site-chip svg { width: 15px; height: 15px; fill: currentColor; }
+.site-chip.more { color: var(--text-muted); }
+.url-disclaimer { max-width: 520px; margin: 16px auto 0; font-size: 12.5px; color: var(--text-muted); line-height: 1.5; }
+
+/* ─── Publicités (emplacements) ────────────────────────────────── */
+/* Chaque emplacement est un cadre aux dimensions exactes d'un format publicitaire
+   standard : la bannière s'y loge précisément, ne déborde pas et ne décale pas la
+   page en se chargeant. Tailles : voir les fichiers du dossier ads/. */
+.ad-slot {
+  display: none; position: relative; left: 50%; transform: translateX(-50%);
+  width: max-content; max-width: calc(100vw - 20px);
+}
+.ad-slot::before {
+  content: 'Publicité'; display: block; margin-bottom: 6px; text-align: start;
+  font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted);
+}
+.ad-slot-inner {
+  box-sizing: content-box; max-width: 100%; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
+}
+.ad-slot-inner iframe, .ad-slot-inner img { max-width: 100%; max-height: 100%; }
+/* Bannière permanente (sous le champ de lien) : 728 × 90, ou 320 × 100 sur petit écran. */
+.ad-slot-hero { margin-top: 28px; }
+.ad-slot-hero .ad-slot-inner { width: 728px; height: 90px; }
+/* Bannière de la fiche vidéo (au-dessus de « Télécharger ») : 468 × 60, ou 320 × 50 sur petit écran. */
+.ad-slot-card { margin-top: 6px; }
+.ad-slot-card .ad-slot-inner { width: 468px; height: 60px; }
+@media (max-width: 800px) { .ad-slot-hero .ad-slot-inner { width: 320px; height: 100px; } }
+@media (max-width: 560px) { .ad-slot-card .ad-slot-inner { width: 320px; height: 50px; } }
+/* Cadre vide (aucune publicité configurée) : affiché seulement hors production,
+   pour visualiser l'emplacement et sa taille. */
+.ad-slot.ad-empty .ad-slot-inner { background: transparent; border: 1px dashed var(--border-2); }
+.ad-slot.ad-empty .ad-slot-inner::after { font-size: 12.5px; color: var(--text-muted); }
+.ad-slot-hero.ad-empty .ad-slot-inner::after { content: 'Espace publicitaire · 728 × 90'; }
+.ad-slot-card.ad-empty .ad-slot-inner::after { content: 'Espace publicitaire · 468 × 60'; }
+@media (max-width: 800px) { .ad-slot-hero.ad-empty .ad-slot-inner::after { content: 'Espace publicitaire · 320 × 100'; } }
+@media (max-width: 560px) { .ad-slot-card.ad-empty .ad-slot-inner::after { content: 'Espace publicitaire · 320 × 50'; } }
+
+/* ─── Messages d'état ──────────────────────────────────────────── */
+#status-area { max-width: 640px; margin: 16px auto 0; text-align: left; }
+.status-msg {
+  display: flex; align-items: flex-start; gap: 10px; padding: 11px 14px;
+  border-radius: var(--r-md); border: 1px solid transparent;
+  font-size: 14px; font-weight: 500; animation: fadeIn .2s ease;
+}
+.status-msg svg { width: 17px; height: 17px; flex-shrink: 0; margin-top: 1px; }
+.status-info    { background: var(--surface); border-color: var(--border); color: var(--text-dim); }
+.status-success { background: var(--success-soft); color: var(--success); }
+.status-error   { background: var(--error-soft); color: var(--error); }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+/* ─── Fiche vidéo ──────────────────────────────────────────────── */
+.video-card {
+  display: none; max-width: 640px; margin: 16px auto 0; text-align: left;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg);
+  box-shadow: var(--shadow-md); animation: fadeIn .25s ease;
+}
+.video-card.show { display: block; }
+.vc-head { display: flex; align-items: flex-start; gap: 16px; padding: 16px; border-bottom: 1px solid var(--border); }
+.video-thumb-wrap {
+  position: relative; width: 184px; flex-shrink: 0; aspect-ratio: 16 / 9;
+  border-radius: 8px; overflow: hidden; background: var(--bg-2);
+}
+.video-thumb-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.video-thumb-placeholder { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--text-muted); }
+.video-thumb-placeholder svg { width: 28px; height: 28px; }
+.thumb-duration {
+  position: absolute; right: 6px; bottom: 6px; padding: 2px 6px; border-radius: 4px;
+  background: rgba(0,0,0,0.78); color: #fff; font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+}
+.vc-head-info { flex: 1; min-width: 0; }
+.vc-title {
+  font-size: 16px; font-weight: 600; line-height: 1.35; color: var(--text); margin-bottom: 8px;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.meta-row { display: flex; flex-wrap: wrap; gap: 4px 14px; }
+.meta-chip { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; color: var(--text-muted); }
+.meta-chip svg { width: 13px; height: 13px; }
+.video-card-body { padding: 16px; }
+
+/* Playlists */
+.vc-playlist-hint {
+  display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; padding: 0;
+  background: none; border: none; cursor: pointer; text-align: start;
+  font-size: 13px; font-weight: 500; color: var(--accent-ink);
+}
+.vc-playlist-hint:hover { text-decoration: underline; text-underline-offset: 2px; }
+.vc-playlist-hint svg { width: 15px; height: 15px; flex-shrink: 0; }
+.pl-head { padding: 16px; border-bottom: 1px solid var(--border); }
+.pl-kicker { font-size: 11.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--accent-ink); margin-bottom: 6px; }
+.pl-quality { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; }
+.pl-q {
+  height: 36px; padding: 0 14px; display: inline-flex; align-items: center; gap: 7px;
+  background: var(--surface); color: var(--text); border: 1px solid var(--border-2); border-radius: 999px;
+  font-size: 13.5px; font-weight: 600; cursor: pointer; transition: border-color .15s, background .15s;
+}
+.pl-q:hover:not(:disabled) { border-color: var(--text-muted); }
+.pl-q.sel { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); background: var(--surface); background: color-mix(in srgb, var(--accent) 7%, var(--surface)); }
+.pl-q.locked { border-style: dashed; color: var(--text-dim); }
+.pl-q:disabled { opacity: .55; cursor: not-allowed; }
+.pl-list-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; font-size: 13.5px; font-weight: 500; }
+.pl-check { display: flex; align-items: center; gap: 10px; min-width: 0; cursor: pointer; }
+.pl-check input { width: 16px; height: 16px; flex-shrink: 0; accent-color: var(--accent); cursor: pointer; }
+.pl-count { font-size: 13px; font-weight: 400; color: var(--text-muted); white-space: nowrap; }
+.pl-list {
+  position: relative; list-style: none; max-height: 304px; overflow-y: auto; margin-bottom: 12px;
+  border: 1px solid var(--border); border-radius: var(--r-md);
+}
+.pl-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
+.pl-item:last-child { border-bottom: none; }
+.pl-item .pl-check { flex: 1; }
+.pl-idx { width: 22px; flex-shrink: 0; text-align: end; font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); }
+.pl-item-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text); }
+.pl-item-side { flex-shrink: 0; font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+.pl-item.off .pl-item-title { color: var(--text-muted); }
+.pl-item.running { background: var(--surface); background: color-mix(in srgb, var(--accent) 6%, var(--surface)); }
+.pl-item.running .pl-item-side { color: var(--accent-ink); font-weight: 600; }
+.pl-item.done .pl-item-side { color: var(--success); font-weight: 600; }
+.pl-item.error .pl-item-side { color: var(--error); font-weight: 600; }
+.pl-note { font-size: 12.5px; color: var(--text-muted); line-height: 1.55; margin-bottom: 2px; }
+#plStopBtn svg { width: 13px; height: 13px; }
+@media (max-width: 560px) {
+  .vc-head { flex-direction: column; }
+  .video-thumb-wrap { width: 100%; }
+}
+
+/* Formats */
+.fmt-label { font-size: 13.5px; font-weight: 600; color: var(--text); margin-bottom: 10px; }
+.fmt-presets { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 16px; }
+@media (max-width: 520px) { .fmt-presets { grid-template-columns: 1fr; } }
+.fmt-card {
+  position: relative; display: flex; align-items: center; gap: 12px;
+  padding: 11px 12px; padding-inline-end: 40px; text-align: start;
+  background: var(--surface); border: 1px solid var(--border-2); border-radius: var(--r-md);
+  cursor: pointer; outline: none; transition: border-color .15s, background .15s;
+}
+.fmt-card:hover { border-color: var(--text-muted); }
+.fmt-card:focus-visible { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.fmt-card::after {
+  content: ''; position: absolute; inset-inline-end: 14px; top: 50%; margin-top: -8px;
+  width: 16px; height: 16px; border-radius: 50%;
+  border: 1.5px solid var(--border-2); background: var(--surface);
+  transition: border-color .15s, box-shadow .15s, background .15s;
+}
+.fmt-card.sel { border-color: var(--accent); background: var(--surface); background: color-mix(in srgb, var(--accent) 6%, var(--surface)); }
+.fmt-card.sel::after { border-color: var(--accent); background: var(--accent); box-shadow: inset 0 0 0 3px var(--surface); }
+.fmt-icon {
+  width: 34px; height: 34px; flex-shrink: 0; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg-2); color: var(--text-dim); transition: color .15s, background .15s;
+}
+.fmt-icon svg { width: 17px; height: 17px; }
+.fmt-card.sel .fmt-icon { background: var(--surface); color: var(--accent-ink); }
+.fmt-info { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.fmt-t { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.3; }
+.fmt-sub { font-size: 12.5px; color: var(--text-muted); margin-top: 2px; }
+.fmt-badge-prem {
+  font-size: 10px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; line-height: 1.5;
+  color: var(--accent-ink); border: 1px solid currentColor; padding: 0 6px; border-radius: 999px;
+}
+.fmt-card.locked { background: var(--bg-2); border-style: dashed; }
+.fmt-card.locked .fmt-icon { background: var(--surface); }
+
+/* Options : sous-titres et découpage */
+.subtitle-opts, .trim-opts {
+  display: block; margin: 0 0 10px; padding: 13px 14px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-md);
+}
+.subtitle-toggle, .trim-toggle { display: flex; align-items: center; gap: 11px; cursor: pointer; user-select: none; }
+.subtitle-toggle input, .trim-toggle input { position: absolute; opacity: 0; pointer-events: none; }
+.subtitle-switch, .trim-switch {
+  position: relative; width: 34px; height: 20px; flex-shrink: 0;
+  border-radius: 999px; background: var(--bg-3); transition: background .15s;
+}
+.subtitle-switch::after, .trim-switch::after {
+  content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px;
+  border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,0.25); transition: transform .15s;
+}
+.subtitle-toggle input:checked + .subtitle-switch,
+.trim-toggle input:checked + .trim-switch { background: var(--accent); }
+.subtitle-toggle input:checked + .subtitle-switch::after,
+.trim-toggle input:checked + .trim-switch::after { transform: translateX(14px); }
+.subtitle-toggle input:focus-visible + .subtitle-switch,
+.trim-toggle input:focus-visible + .trim-switch { outline: 2px solid var(--accent); outline-offset: 2px; }
+.subtitle-toggle-label, .trim-toggle-label { font-size: 14px; font-weight: 500; color: var(--text); }
+.subtitle-lang-wrap { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+.subtitle-lang-label, .trim-field label { font-size: 12.5px; font-weight: 500; color: var(--text-dim); }
+.subtitle-lang-select, .trim-field input {
+  width: 100%; height: 40px; padding: 0 12px;
+  background: var(--surface); border: 1px solid var(--border-2); border-radius: 8px;
+  font-size: 14px; color: var(--text); outline: none; transition: border-color .15s, box-shadow .15s;
+}
+.subtitle-lang-select { cursor: pointer; }
+.subtitle-lang-select:focus, .trim-field input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.subtitle-hint { font-size: 12.5px; color: var(--text-muted); line-height: 1.5; }
+.trim-toggle-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.trim-toggle.locked { cursor: not-allowed; opacity: .55; }
+.trim-trials-badge {
+  font-size: 12px; font-weight: 600; color: var(--text-dim); background: var(--bg-2);
+  padding: 2px 9px; border-radius: 999px; white-space: nowrap;
+}
+.trim-trials-badge.limit-reached { color: var(--error); background: var(--error-soft); }
+.trim-fields-wrap {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  max-height: 0; opacity: 0; overflow: hidden;
+  transition: max-height .25s ease, opacity .2s ease, margin-top .25s ease;
+}
+.trim-fields-wrap.open { max-height: 140px; opacity: 1; margin-top: 12px; }
+.trim-field { display: flex; flex-direction: column; gap: 6px; }
+@media (max-width: 480px) { .trim-fields-wrap { grid-template-columns: 1fr; } .trim-fields-wrap.open { max-height: 220px; } }
+
+/* Actions & progression */
+.action-row { display: flex; gap: 8px; margin-top: 16px; }
+.btn-dl {
+  flex: 1; height: 48px; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  background: var(--text); color: var(--bg); border: none; border-radius: var(--r-md);
+  font-size: 15px; font-weight: 600; cursor: pointer; transition: opacity .15s;
+}
+.btn-dl:hover:not(:disabled) { opacity: .86; }
+.btn-dl:disabled { opacity: .5; cursor: not-allowed; }
+.btn-dl svg { width: 17px; height: 17px; }
+.btn-watch {
+  height: 48px; padding: 0 16px; display: inline-flex; align-items: center; gap: 8px;
+  background: var(--surface); color: var(--text); border: 1px solid var(--border-2); border-radius: var(--r-md);
+  font-size: 15px; font-weight: 500; cursor: pointer; transition: background .15s;
+}
+.btn-watch:hover { background: var(--bg-2); }
+.btn-watch svg { width: 15px; height: 15px; }
+#simBtn { border-style: dashed; }
+
+.progress-wrap { display: none; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
+.progress-wrap.show { display: block; }
+.progress-header { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 8px; font-size: 13.5px; color: var(--text-dim); }
+.progress-pct { font-family: var(--font-mono); font-size: 13px; font-weight: 600; color: var(--text); flex-shrink: 0; }
+.progress-track { height: 6px; background: var(--bg-2); border-radius: 999px; overflow: hidden; }
+.progress-fill { height: 100%; width: 0%; background: var(--accent); border-radius: 999px; transition: width .3s ease; }
+.progress-details {
+  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 4px 14px;
+  margin-top: 8px; font-family: var(--font-mono); font-size: 12px; color: var(--text-muted);
+}
+.progress-details > div { display: flex; gap: 14px; }
+
+/* ─── Sections ─────────────────────────────────────────────────── */
+.section { padding: 104px 0; border-top: 1px solid var(--border); }
+.section-inner { max-width: var(--container); margin: 0 auto; padding: 0 24px; }
+.sec-head {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 20px 72px; align-items: end; margin-bottom: 56px;
+}
+.sec-label { font-size: 13.5px; font-weight: 600; color: var(--accent-ink); margin-bottom: 14px; }
+.sec-title {
+  font-family: var(--font-display); font-weight: 650;
+  font-size: clamp(30px, 4vw, 46px); line-height: 1.08; letter-spacing: -0.03em; text-wrap: balance;
+}
+.sec-title span { display: block; }
+.sec-title .hl-2 { color: var(--text-muted); }
+.sec-sub { font-size: 16.5px; color: var(--text-dim); line-height: 1.65; max-width: 480px; text-wrap: pretty; }
+@media (max-width: 860px) { .sec-head { grid-template-columns: 1fr; margin-bottom: 40px; } }
+@media (max-width: 640px) { .section { padding: 72px 0; } .section-inner { padding: 0 18px; } }
+
+/* Fonctionnalités */
+.feat-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 48px; }
+.feat-card { padding: 28px 0 32px; border-top: 1px solid var(--border); }
+.feat-icon { width: 22px; height: 22px; color: var(--text); margin-bottom: 20px; }
+.feat-icon svg { width: 22px; height: 22px; }
+.feat-title { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+.feat-desc { font-size: 14.5px; color: var(--text-dim); line-height: 1.6; max-width: 36ch; }
+@media (max-width: 900px) { .feat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .feat-grid { grid-template-columns: 1fr; } }
+
+/* Étapes */
+.steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 48px; }
+.step { padding-top: 24px; border-top: 1px solid var(--border-2); }
+.step-num { display: block; font-family: var(--font-mono); font-size: 13px; font-weight: 600; color: var(--accent-ink); margin-bottom: 32px; }
+.step-title { font-family: var(--font-display); font-size: 22px; font-weight: 600; letter-spacing: -0.015em; margin-bottom: 8px; }
+.step-desc { font-size: 14.5px; color: var(--text-dim); line-height: 1.6; max-width: 34ch; }
+@media (max-width: 760px) { .steps { grid-template-columns: 1fr; gap: 36px; } .step-num { margin-bottom: 16px; } }
+
+/* Tarifs */
+/* Compte Premium : la section Tarifs et les liens qui y mènent sont masqués. */
+.is-premium #pricing, .is-premium a[href="#pricing"] { display: none; }
+/* Titre à gauche, deux cartes compactes à droite. */
+.pricing-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.75fr); gap: 36px 56px; align-items: start; }
+.pricing-intro .sec-title { font-size: clamp(28px, 3.1vw, 38px); }
+.pricing-intro .sec-sub { margin-top: 16px; font-size: 15.5px; }
+.pricing-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 980px) { .pricing-layout { grid-template-columns: 1fr; } .pricing-grid { max-width: 680px; } }
+@media (max-width: 620px) { .pricing-grid { grid-template-columns: 1fr; max-width: 420px; } }
+.price-card {
+  display: flex; flex-direction: column; padding: 24px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg);
+}
+.price-badge { font-size: 14px; font-weight: 600; margin-bottom: 14px; }
+.price-num {
+  display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px 7px;
+  font-family: var(--font-display); font-size: 32px; font-weight: 650;
+  letter-spacing: -0.03em; line-height: 1.05; white-space: nowrap;
+}
+.price-unit { font-family: var(--font-sans); font-size: 14px; font-weight: 500; letter-spacing: 0; color: var(--text-muted); }
+.price-period { font-size: 13px; color: var(--text-muted); margin: 8px 0 0; }
+.price-features {
+  list-style: none; display: flex; flex-direction: column; gap: 9px;
+  margin: 18px 0 22px; padding-top: 18px; border-top: 1px solid var(--border);
+}
+.price-features li { display: flex; align-items: flex-start; gap: 9px; font-size: 14px; color: var(--text-dim); }
+.price-features li svg { width: 15px; height: 15px; flex-shrink: 0; margin-top: 3px; color: var(--success); }
+.plan-card .btn-price { margin-top: auto; }
+.price-card .btn-price { min-height: 42px; font-size: 14.5px; }
+.price-card.pro { background: var(--text); border-color: var(--text); color: var(--bg); }
+.price-card.pro .price-unit,
+.price-card.pro .price-period,
+.price-card.pro .price-features li { color: var(--bg); opacity: .78; }
+.price-card.pro .price-features { border-top-color: rgba(127,127,127,0.28); }
+.price-card.pro .price-features li svg { color: var(--accent); }
+.btn-price {
+  width: 100%; min-height: 46px; padding: 0 16px;
+  border-radius: var(--r-md); border: 1px solid transparent;
+  font-size: 15px; font-weight: 600; cursor: pointer; transition: opacity .15s, background .15s;
+}
+.btn-price.outline { background: var(--surface); border-color: var(--border-2); color: var(--text); }
+.btn-price.outline:hover { background: var(--bg-2); }
+.btn-price.filled { background: var(--bg); color: var(--text); }
+.btn-price.filled:hover { opacity: .9; }
+.btn-price.btn-sm { min-height: 38px; font-size: 13.5px; }
+
+/* FAQ */
+.faq-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.55fr); gap: 40px 80px; align-items: start; }
+.faq-layout .sec-sub { margin-top: 16px; }
+.faq-list { border-top: 1px solid var(--border); }
+.faq-item { border-bottom: 1px solid var(--border); }
+.faq-item summary {
+  list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 24px;
+  padding: 20px 0; font-size: 16px; font-weight: 600; color: var(--text);
+}
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary::after {
+  content: ''; flex-shrink: 0; width: 9px; height: 9px; margin-inline-end: 4px;
+  border-right: 1.6px solid var(--text-muted); border-bottom: 1.6px solid var(--text-muted);
+  transform: translateY(-3px) rotate(45deg); transition: transform .2s ease;
+}
+.faq-item[open] summary::after { transform: translateY(2px) rotate(-135deg); }
+.faq-item p { padding: 0 0 22px; font-size: 15px; color: var(--text-dim); line-height: 1.7; max-width: 64ch; }
+@media (max-width: 860px) { .faq-layout { grid-template-columns: 1fr; } }
+
+/* ─── Pied de page ─────────────────────────────────────────────── */
+footer { border-top: 1px solid var(--border); }
+.footer-inner { max-width: var(--container); margin: 0 auto; padding: 64px 24px 28px; }
+.footer-top { display: grid; grid-template-columns: minmax(0, 1.7fr) repeat(3, minmax(0, 1fr)); gap: 40px 32px; }
+.footer-tagline { font-size: 14px; color: var(--text-dim); line-height: 1.6; max-width: 34ch; margin: 16px 0 20px; }
+.footer-social { display: flex; gap: 8px; }
+.social-icon-btn {
+  width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--border-2); border-radius: var(--r-sm); color: var(--text-dim);
+  transition: color .15s, border-color .15s, background .15s;
+}
+.social-icon-btn:hover { color: var(--text); border-color: var(--text-muted); background: var(--surface); }
+.social-icon-btn svg { width: 16px; height: 16px; fill: currentColor; }
+.footer-col h3 { font-size: 13.5px; font-weight: 600; color: var(--text); margin-bottom: 12px; }
+.footer-col a { display: block; width: fit-content; padding: 4px 0; font-size: 14px; color: var(--text-dim); text-decoration: none; transition: color .15s; }
+.footer-col a:hover { color: var(--text); }
+.footer-bottom {
+  display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px 24px;
+  margin-top: 56px; padding-top: 24px; border-top: 1px solid var(--border);
+  font-size: 13px; color: var(--text-muted);
+}
+@media (max-width: 860px) { .footer-top { grid-template-columns: repeat(3, minmax(0, 1fr)); } .footer-brand { grid-column: 1 / -1; } }
+@media (max-width: 520px) { .footer-top { grid-template-columns: 1fr 1fr; } .footer-inner { padding: 48px 18px 24px; } }
+
+/* ─── Motifs flottants en arrière-plan (symboles vidéo / audio) ─── */
+.bg-motifs { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+.bg-motifs-layer { position: absolute; top: 0; left: 0; width: 100%; height: 200vh; will-change: transform; }
+.motif {
+  position: absolute; width: var(--s, 80px); height: auto; color: var(--accent);
+  fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
+  opacity: .24; filter: blur(1.2px);
+  animation: motifFloat var(--d, 10s) ease-in-out infinite alternate; animation-delay: var(--delay, 0s);
+}
+/* Deux profondeurs : les motifs « lointains » sont plus flous et plus discrets. */
+.motif.far { opacity: .15; filter: blur(3px); }
+@keyframes motifFloat {
+  from { transform: translateY(0) rotate(var(--r, 0deg)) scale(1); }
+  to   { transform: translateY(-26px) rotate(calc(var(--r, 0deg) + 10deg)) scale(1.05); }
+}
+[data-theme="dark"] .motif { opacity: .30; }
+[data-theme="dark"] .motif.far { opacity: .19; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .motif { opacity: .30; }
+  :root:not([data-theme="light"]) .motif.far { opacity: .19; }
+}
+/* Sur téléphone il n'y a pas de marges : motifs plus petits, moins nombreux et plus discrets. */
+@media (max-width: 720px) {
+  .motif { width: calc(var(--s, 80px) * .62); opacity: .16; }
+  .motif.far { opacity: .11; }
+  .motif.m-hide { display: none; }
+  [data-theme="dark"] .motif { opacity: .22; }
+  [data-theme="dark"] .motif.far { opacity: .15; }
+}
+@media (max-width: 720px) and (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .motif { opacity: .22; }
+  :root:not([data-theme="light"]) .motif.far { opacity: .15; }
+}
+
+/* ─── Apparition au défilement ─────────────────────────────────── */
+.reveal { opacity: 0; transform: translateY(12px); transition: opacity .6s ease, transform .6s ease; }
+.reveal.in { opacity: 1; transform: none; }
+
+/* ─── Indicateur de chargement ─────────────────────────────────── */
+.spin {
+  display: inline-block; width: 15px; height: 15px; flex-shrink: 0;
+  border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%;
+  opacity: .8; animation: rot .7s linear infinite;
+}
+@keyframes rot { to { transform: rotate(360deg); } }
+
+/* ─── Fenêtres (connexion, Premium, compte) ────────────────────── */
+.modal-backdrop {
+  position: fixed; inset: 0; z-index: 1000; padding: 20px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(15,15,14,0.5); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+  opacity: 0; pointer-events: none; transition: opacity .2s;
+}
+.modal-backdrop.open { opacity: 1; pointer-events: auto; }
+.modal {
+  position: relative; width: 100%; max-width: 440px; max-height: calc(100vh - 40px); overflow-y: auto;
+  padding: 28px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+  box-shadow: var(--shadow-lg); transform: translateY(8px); transition: transform .2s;
+}
+.modal-backdrop.open .modal { transform: none; }
+.modal-close {
+  position: absolute; top: 14px; right: 14px; width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent; border: none; border-radius: var(--r-sm); color: var(--text-muted); cursor: pointer;
+}
+.modal-close:hover { background: var(--bg-2); color: var(--text); }
+.modal-close svg { width: 16px; height: 16px; }
+.modal-title { font-family: var(--font-display); font-size: 24px; font-weight: 650; letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 6px; padding-right: 36px; }
+.modal-sub { font-size: 14.5px; color: var(--text-dim); margin-bottom: 22px; }
+.auth-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; margin-bottom: 20px; background: var(--bg-2); border-radius: var(--r-md); }
+.auth-tab { height: 36px; border: none; border-radius: 7px; background: transparent; color: var(--text-dim); font-size: 14px; font-weight: 500; cursor: pointer; }
+.auth-tab.active { background: var(--surface); color: var(--text); font-weight: 600; box-shadow: var(--shadow-sm); }
+.field-group { display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px; }
+.field-label { font-size: 13px; font-weight: 500; color: var(--text-dim); margin-bottom: 6px; }
+.field-input {
+  width: 100%; height: 44px; padding: 0 13px;
+  background: var(--surface); border: 1px solid var(--border-2); border-radius: 8px;
+  font-size: 15px; color: var(--text); outline: none; transition: border-color .15s, box-shadow .15s;
+}
+.field-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+/* Champ mot de passe avec bouton « œil » pour afficher / masquer la saisie */
+.pwd-field { position: relative; }
+.pwd-field .field-input { padding-inline-end: 46px; }
+.pwd-toggle {
+  position: absolute; top: 0; inset-inline-end: 0; width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  background: none; border: none; border-radius: 8px; color: var(--text-muted); cursor: pointer;
+}
+.pwd-toggle:hover { color: var(--text); }
+.pwd-toggle svg { width: 18px; height: 18px; }
+.pwd-toggle .eye-off { display: none; }
+.pwd-toggle[aria-pressed="true"] .eye-on { display: none; }
+.pwd-toggle[aria-pressed="true"] .eye-off { display: block; }
+.btn-submit {
+  width: 100%; height: 46px; display: flex; align-items: center; justify-content: center; gap: 8px;
+  background: var(--text); color: var(--bg); border: none; border-radius: var(--r-md);
+  font-size: 15px; font-weight: 600; cursor: pointer; transition: opacity .15s;
+}
+.btn-submit:hover { opacity: .86; }
+.btn-submit:disabled { opacity: .5; cursor: not-allowed; }
+.auth-error { display: none; margin-top: 12px; font-size: 13.5px; color: var(--error); }
+.auth-success { display: none; margin-top: 12px; font-size: 13.5px; color: var(--success); }
+.link-btn {
+  margin-inline-start: 8px; padding: 0; background: none; border: none; cursor: pointer;
+  color: var(--text); font-weight: 600; text-decoration: underline; text-underline-offset: 2px;
+}
+
+/* Premium */
+.prem-modal-header { margin-bottom: 20px; }
+.prem-kicker { font-size: 13.5px; font-weight: 600; color: var(--accent-ink); margin-bottom: 8px; }
+.prem-price-tag {
+  display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 8px;
+  font-family: var(--font-display); font-size: 40px; font-weight: 650; letter-spacing: -0.03em; line-height: 1.05;
+}
+.prem-price-tag .fcfa { font-size: 19px; font-weight: 600; letter-spacing: 0; }
+.prem-price-tag .approx { font-family: var(--font-sans); font-size: 14px; font-weight: 500; letter-spacing: 0; color: var(--text-muted); }
+.prem-price-sub { font-size: 14px; color: var(--text-dim); margin-top: 8px; }
+.prem-geo { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; margin-top: 12px; font-size: 13px; color: var(--text-dim); }
+#premGeoIndicator { display: inline-flex; align-items: center; gap: 6px; }
+#premGeoFlag img { border-radius: 2px; }
+#premGeoFixBtn {
+  padding: 0; background: none; border: none; cursor: pointer;
+  color: var(--text); font-size: 13px; font-weight: 500; text-decoration: underline; text-underline-offset: 2px;
+}
+#premCountryPicker {
+  width: 100%; height: 40px; margin-top: 10px; padding: 0 10px;
+  background: var(--surface); border: 1px solid var(--border-2); border-radius: 8px; font-size: 14px; color: var(--text);
+}
+/* Choix de la durée : trois options, celle d'un an mise en avant (« Meilleur prix »). */
+.plan-switcher { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 0 0 18px; padding-top: 10px; }
+.plan-switcher button {
+  position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  min-height: 78px; padding: 12px 4px 10px; background: var(--surface); color: var(--text);
+  border: 1px solid var(--border-2); border-radius: var(--r-md); cursor: pointer;
+  transition: border-color .15s, background .15s, box-shadow .15s;
+}
+.plan-switcher button:hover { border-color: var(--text-muted); }
+.plan-switcher button.active {
+  border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent);
+  background: var(--surface); background: color-mix(in srgb, var(--accent) 7%, var(--surface));
+}
+.plan-name { font-size: 14.5px; font-weight: 600; }
+/* Le prix et « / mois » restent chacun d'un seul tenant ; sur écran étroit, « / mois » passe à la ligne. */
+.plan-permonth { display: flex; flex-wrap: wrap; justify-content: center; gap: 0 3px; font-size: 12px; line-height: 1.35; color: var(--text-muted); }
+.plan-permonth span { white-space: nowrap; }
+.plan-save { font-size: 12px; font-weight: 700; color: var(--success); }
+.plan-flag {
+  position: absolute; top: -10px; left: 50%; transform: translateX(-50%); white-space: nowrap;
+  padding: 2px 8px; border-radius: 999px; background: #5A40D0; color: #fff;
+  font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+}
+.prem-benefits-card {
+  display: grid; grid-template-columns: 1fr; gap: 9px;
+  padding: 16px 0; margin-bottom: 16px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+}
+.prem-benefit-item { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text); }
+.prem-check-icon { display: flex; flex-shrink: 0; color: var(--success); }
+.prem-check-icon svg { width: 16px; height: 16px; }
+.prem-guest-box { padding: 14px; margin-bottom: 16px; background: var(--bg-2); border-radius: var(--r-md); }
+.prem-guest-txt { font-size: 14px; color: var(--text); margin-bottom: 12px; }
+.prem-guest-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+/* Sur écran étroit, les deux boutons passent l'un sous l'autre au lieu de se serrer. */
+.btn-prem-register, .btn-prem-login { flex: 1 1 130px; height: 40px; padding: 0 10px; border-radius: 8px; font-size: 14px; white-space: nowrap; cursor: pointer; }
+.btn-prem-register { background: var(--text); color: var(--bg); border: none; font-weight: 600; }
+.btn-prem-login { background: var(--surface); color: var(--text); border: 1px solid var(--border-2); font-weight: 500; }
+.prem-logged-box {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 12px 14px; margin-bottom: 14px; background: var(--bg-2); border-radius: var(--r-md);
+  font-size: 14px; color: var(--text-dim);
+}
+.prem-logged-box strong { color: var(--text); font-weight: 600; word-break: break-all; }
+.prem-ready { color: var(--success); font-weight: 600; white-space: nowrap; }
+.prem-cgv-check { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 16px; font-size: 14px; color: var(--text-dim); line-height: 1.45; cursor: pointer; user-select: none; }
+.prem-cgv-check input { width: 17px; height: 17px; margin-top: 1px; flex-shrink: 0; accent-color: var(--text); cursor: pointer; }
+.prem-cgv-check a { color: var(--text); text-underline-offset: 2px; }
+.btn-prem-pay {
+  width: 100%; height: 50px; display: flex; align-items: center; justify-content: center; gap: 10px;
+  background: var(--text); color: var(--bg); border: none; border-radius: var(--r-md);
+  font-size: 16px; font-weight: 600; cursor: pointer; transition: opacity .15s;
+}
+.btn-prem-pay:hover:not(:disabled) { opacity: .88; }
+.btn-prem-pay:disabled { opacity: .4; cursor: not-allowed; }
+.btn-prem-pay svg { width: 18px; height: 18px; }
+.prem-security-badge { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 12px; font-size: 12.5px; color: var(--text-muted); }
+.prem-security-badge svg { width: 14px; height: 14px; }
+
+/* Compte */
+.profile-info { margin-bottom: 20px; }
+.profile-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+.profile-row:first-child { border-top: 1px solid var(--border); }
+.profile-row > span:first-child { color: var(--text-muted); }
+.profile-row > span:last-child { font-weight: 600; color: var(--text); text-align: end; word-break: break-all; }
+.profile-since { font-size: 12.5px; color: var(--text-muted); margin-top: 8px; }
+.api-box { display: none; margin-bottom: 16px; padding: 16px; background: var(--bg-2); border-radius: var(--r-md); }
+.api-box-title { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+.api-box p { font-size: 13.5px; color: var(--text-dim); margin-bottom: 12px; }
+.api-box p a { color: var(--text); }
+.api-key {
+  display: block; word-break: break-all; margin-bottom: 10px; padding: 10px 12px;
+  background: var(--surface); border: 1px solid var(--border-2); border-radius: 8px;
+  font-family: var(--font-mono); font-size: 12.5px; color: var(--text);
+}
+.btn-row { display: flex; gap: 8px; margin-bottom: 10px; }
+.btn-row:last-child { margin-bottom: 0; }
+.btn-row .btn-price { flex: 1; }
+.btn-price.danger { color: var(--error); }
+.api-note { font-size: 12.5px !important; color: var(--text-muted) !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .motif { animation: none; }
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ MOTIFS D'ARRIÈRE-PLAN : symboles vidéo / audio qui flottent doucement ═══ -->
+<div class="bg-motifs" aria-hidden="true">
+  <div class="bg-motifs-layer" id="prlxLayer">
+    <!-- Premier écran -->
+    <svg class="motif" style="top:5%;left:5%;--s:92px;--d:9s;--r:-6deg" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+    <svg class="motif far" style="top:8%;right:6%;--s:120px;--d:13s;--delay:-4s;--r:8deg" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+    <svg class="motif far m-hide" style="top:19%;left:14%;--s:62px;--d:11s;--delay:-6s" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="10" y1="15" x2="10" y2="9"/><line x1="14" y1="15" x2="14" y2="9"/></svg>
+    <svg class="motif m-hide" style="top:22%;right:15%;--s:70px;--d:10s;--delay:-2s;--r:-10deg" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>
+    <svg class="motif far" style="top:31%;left:3%;--s:128px;--d:15s;--delay:-8s;--r:6deg" viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
+    <svg class="motif" style="top:34%;right:4%;--s:96px;--d:8s;--delay:-3s" viewBox="0 0 24 24"><line x1="4" y1="10" x2="4" y2="14"/><line x1="8" y1="6" x2="8" y2="18"/><line x1="12" y1="3" x2="12" y2="21"/><line x1="16" y1="8" x2="16" y2="16"/><line x1="20" y1="11" x2="20" y2="13"/></svg>
+    <svg class="motif far m-hide" style="top:42%;left:17%;--s:60px;--d:12s;--delay:-5s;--r:-4deg" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    <svg class="motif far" style="top:43%;right:11%;--s:136px;--d:14s;--delay:-1s;--r:4deg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+    <!-- Suite de la page (révélée par le défilement) -->
+    <svg class="motif far m-hide" style="top:50%;left:39%;--s:52px;--d:10s;--delay:-7s" viewBox="0 0 24 24"><circle cx="8" cy="18" r="3"/><path d="M11 18V4l8 3"/></svg>
+    <svg class="motif" style="top:54%;left:6%;--s:100px;--d:11s;--delay:-2s;--r:8deg" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+    <svg class="motif far" style="top:57%;right:6%;--s:88px;--d:13s;--delay:-9s;--r:-6deg" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+    <svg class="motif far m-hide" style="top:62%;right:29%;--s:46px;--d:9s;--delay:-4s" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+    <svg class="motif far" style="top:65%;left:14%;--s:74px;--d:15s;--delay:-6s" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+    <svg class="motif far m-hide" style="top:68%;right:16%;--s:60px;--d:10s;--delay:-1s;--r:6deg" viewBox="0 0 24 24"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+    <svg class="motif" style="top:75%;left:4%;--s:90px;--d:12s;--delay:-5s;--r:-8deg" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
+    <svg class="motif far" style="top:78%;right:5%;--s:116px;--d:14s;--delay:-3s;--r:5deg" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="15" rx="2"/><polyline points="17 2 12 7 7 2"/></svg>
+    <svg class="motif far m-hide" style="top:85%;left:13%;--s:56px;--d:9s;--delay:-7s" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+    <svg class="motif" style="top:88%;right:7%;--s:84px;--d:11s;--delay:-2s;--r:-5deg" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+  </div>
+</div>
+
+<!-- ═══ NAVIGATION ═════════════════════════════════════════════════ -->
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" href="#" aria-label="StreamLoader">
+      <svg class="brand-mark" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M13 2L4.5 13.5H11L10.5 22L19.5 10.5H13L13 2Z" fill="url(#slBoltNav)"/><defs><linearGradient id="slBoltNav" x1="4.5" y1="2" x2="19.5" y2="22" gradientUnits="userSpaceOnUse"><stop stop-color="#C4A5FF"/><stop offset="1" stop-color="#7B5FF5"/></linearGradient></defs></svg>
+      <span class="nav-wordmark" data-i18n="brand">StreamLoader</span>
+    </a>
+    <div class="nav-links">
+      <a href="#features" data-i18n="nav.features">Fonctionnalités</a>
+      <a href="#how"      data-i18n="nav.how">Comment ça marche</a>
+      <a href="#pricing"  data-i18n="nav.pricing">Tarifs</a>
+      <a href="#faq"      data-i18n="nav.faq">FAQ</a>
+    </div>
+    <div class="nav-actions">
+      <button class="nav-icon-btn" id="langBtn" title="Langue" aria-label="Changer de langue">
+        <svg class="lang-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>
+        <span id="langLabel">FR</span>
+      </button>
+      <button class="nav-icon-btn" id="themeBtn" title="Thème clair / sombre" aria-label="Changer de thème">
+        <svg id="themeIco" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v17a8.5 8.5 0 0 0 0-17z" fill="currentColor" stroke="none"/></svg>
+      </button>
+      <!-- Affiché si non connecté -->
+      <button class="nav-cta" id="navCta" onclick="openModal('login')" data-i18n="nav.cta">Connexion</button>
+      <!-- Affiché si connecté -->
+      <div class="nav-user-chip" id="navUserChip" style="display:none" onclick="openModal('profile')">
+        <div class="nav-avatar" id="navAvatar">?</div>
+        <span id="navEmail"></span>
+        <span class="plan-badge" id="navPlan" style="display:none">Premium</span>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══ HERO ═══════════════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-inner">
+    <h1 class="hero-title">
+      <span class="hl-1" data-i18n="hero.line1">Télécharge tes vidéos</span>
+      <span class="hl-2" data-i18n="hero.line2">à partir d’un simple lien.</span>
+    </h1>
+
+    <p class="hero-sub" data-i18n="hero.sub">Colle le lien d'une vidéo YouTube, TikTok, Instagram, X ou Facebook, choisis la qualité, et récupère ton fichier.</p>
+
+    <div class="url-widget">
+      <svg class="url-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+      <input type="url" id="urlInput" data-i18n-placeholder="hero.placeholder" placeholder="Colle le lien de la vidéo…" autocomplete="off" spellcheck="false">
+      <button class="btn-analyze" id="analyzeBtn" onclick="analyzeUrl()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <span data-i18n="hero.analyze">Analyser</span>
+      </button>
+    </div>
+
+    <div id="status-area"></div>
+
+    <!-- Fiche vidéo -->
+    <div class="video-card" id="videoCard">
+      <div class="vc-head">
+        <div class="video-thumb-wrap" id="thumbWrap">
+          <div class="video-thumb-placeholder" id="thumbPlaceholder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="3"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+          </div>
+          <img id="thumbImg" class="video-thumb-img" style="display:none" alt="Miniature">
+          <div class="thumb-duration" id="thumbDuration" style="display:none"></div>
+        </div>
+        <div class="vc-head-info">
+          <div class="vc-title" id="vcTitle"></div>
+          <div class="meta-row" id="vcMeta"></div>
+          <!-- Affiché si la vidéo vient d'une playlist : ouvre la playlist entière -->
+          <button type="button" class="vc-playlist-hint" id="vcPlaylistHint" style="display:none" onclick="openPlaylistFromVideo()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h11M4 12h11M4 18h7"/><path d="m17 15 4 2.5-4 2.5z" fill="currentColor"/></svg>
+            <span data-i18n="pl.hint">Cette vidéo fait partie d’une playlist · Voir toute la playlist</span>
+          </button>
+        </div>
+      </div>
+      <div class="video-card-body">
+        <div class="fmt-label" data-i18n="card.format">Format</div>
+        <div class="fmt-presets" id="vcFmts"></div>
+
+        <!-- Sous-titres : choisir avec/sans + langue -->
+        <div id="subtitleOpts" class="subtitle-opts">
+          <label class="subtitle-toggle" for="subtitleToggle">
+            <input type="checkbox" id="subtitleToggle">
+            <span class="subtitle-switch"></span>
+            <span class="subtitle-toggle-label" data-i18n="card.withSubs">Télécharger avec sous-titres</span>
+          </label>
+          <div id="subtitleLangWrap" class="subtitle-lang-wrap" style="display:none">
+            <span class="subtitle-lang-label" data-i18n="card.subsLang">Langue des sous-titres</span>
+            <select id="subtitleLang" class="subtitle-lang-select">
+              <option value="fr">Français</option>
+              <option value="en">Anglais</option>
+              <option value="es">Espagnol</option>
+              <option value="it">Italien</option>
+              <option value="de">Allemand</option>
+              <option value="ar">Arabe</option>
+            </select>
+            <p class="subtitle-hint" data-i18n="card.subsHint">Les sous-titres seront intégrés à la vidéo, dans la langue choisie, quelle que soit la langue d'origine.</p>
+          </div>
+        </div>
+
+        <!-- Découpage vidéo sur mesure : extraire une scène précise -->
+        <div id="trimOpts" class="trim-opts">
+          <div class="trim-toggle-row">
+            <label class="trim-toggle" for="trimToggle" id="trimToggleWrap">
+              <input type="checkbox" id="trimToggle">
+              <span class="trim-switch"></span>
+              <span class="trim-toggle-label" data-i18n="card.trimToggle">Extraire une scène précise</span>
+            </label>
+            <span id="trimTrialsBadge" class="trim-trials-badge" style="display:none"></span>
+          </div>
+          <div id="trimFieldsWrap" class="trim-fields-wrap">
+            <div class="trim-field">
+              <label for="trimStart" data-i18n="card.trimStart">Début (ex: 00:10)</label>
+              <input type="text" id="trimStart" placeholder="00:10" inputmode="numeric" autocomplete="off">
+            </div>
+            <div class="trim-field">
+              <label for="trimEnd" data-i18n="card.trimEnd">Fin (ex: 00:25)</label>
+              <input type="text" id="trimEnd" placeholder="00:25" inputmode="numeric" autocomplete="off">
+            </div>
+          </div>
+        </div>
+
+        <div id="ad-slot-card" class="ad-slot ad-slot-card" role="complementary" aria-label="Publicité">
+          <div class="ad-slot-inner"></div>
+        </div>
+
+        <div class="action-row">
+          <button class="btn-dl" id="dlBtn" onclick="startDownloadFromButton()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span data-i18n="card.download">Télécharger</span>
+          </button>
+          <!-- Bouton de simulation, visible uniquement en développement (localhost) -->
+          <button class="btn-watch" id="simBtn" onclick="simulateDownload()" style="display:none" title="Simuler la progression du téléchargement">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 2.5a2.5 2.5 0 0 1 3 3L5 18l-3 3 3-3 12.5-12.5z"/><path d="M20 6L18 4M6 20l-2 2M12 2l2-2M5 9l-2 2"/></svg>
+          </button>
+          <button class="btn-watch" onclick="openBrowser()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <span data-i18n="card.watch">Regarder</span>
+          </button>
+        </div>
+        <div class="progress-wrap" id="progressWrap">
+          <div class="progress-header">
+            <span id="progressLbl">Téléchargement en cours…</span>
+            <span id="progressPct" class="progress-pct"></span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+          <!-- Détails temps réel : taille totale, vitesse, temps restant -->
+          <div class="progress-details">
+            <div>
+              <span id="progressTotal"></span>
+              <span id="progressSpeed"></span>
+            </div>
+            <span id="progressEta"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fiche playlist : liste des vidéos, qualité commune, téléchargement une par une -->
+    <div class="video-card" id="playlistCard">
+      <div class="pl-head">
+        <div class="pl-kicker" data-i18n="pl.kicker">Playlist</div>
+        <div class="vc-title" id="plTitle"></div>
+        <div class="meta-row" id="plMeta"></div>
+      </div>
+      <div class="video-card-body">
+        <div class="fmt-label" data-i18n="pl.quality">Qualité pour toute la playlist</div>
+        <div class="pl-quality" id="plQuality"></div>
+
+        <div class="pl-list-head">
+          <label class="pl-check">
+            <input type="checkbox" id="plSelectAll" onchange="togglePlaylistAll(this.checked)">
+            <span data-i18n="pl.selectAll">Tout sélectionner</span>
+          </label>
+          <span class="pl-count" id="plCount"></span>
+        </div>
+        <ul class="pl-list" id="plList"></ul>
+
+        <p class="pl-note" id="plNote"></p>
+
+        <div class="action-row">
+          <button class="btn-dl" id="plStartBtn" onclick="startPlaylistFromButton()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span id="plStartLabel">Télécharger la sélection</span>
+          </button>
+          <button class="btn-watch" id="plStopBtn" style="display:none" onclick="stopPlaylist()">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+            <span data-i18n="pl.stop">Arrêter</span>
+          </button>
+        </div>
+        <div class="progress-wrap" id="plProgressWrap">
+          <div class="progress-header">
+            <span id="plProgressLbl"></span>
+            <span id="plProgressPct" class="progress-pct"></span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" id="plProgressFill"></div>
+          </div>
+          <div class="progress-details"><span id="plProgressDetail"></span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="site-chips">
+      <span class="site-chips-label" data-i18n="hero.supports">Fonctionne avec</span>
+      <span class="site-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23.495 6.205a3.007 3.007 0 0 0-2.088-2.088c-1.87-.501-9.396-.501-9.396-.501s-7.507-.01-9.396.501A3.007 3.007 0 0 0 .527 6.205a31.247 31.247 0 0 0-.522 5.805 31.247 31.247 0 0 0 .522 5.783 3.007 3.007 0 0 0 2.088 2.088c1.868.502 9.396.502 9.396.502s7.506 0 9.396-.502a3.007 3.007 0 0 0 2.088-2.088 31.247 31.247 0 0 0 .5-5.783 31.247 31.247 0 0 0-.5-5.805zM9.609 15.601V8.408l6.264 3.602z"/></svg>YouTube</span>
+      <span class="site-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34l-.01-9.27a8.18 8.18 0 0 0 4.78 1.52v-3.45a4.85 4.85 0 0 1-1-.11z"/></svg>TikTok</span>
+      <span class="site-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>Instagram</span>
+      <span class="site-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>X</span>
+      <span class="site-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>Facebook</span>
+      <span class="site-chip more" data-i18n="hero.more">et 1 000+ autres sites</span>
+    </div>
+
+    <p class="url-disclaimer" data-i18n="hero.disclaimer">StreamLoader est un outil technique. Vous êtes responsable de disposer des droits nécessaires sur les médias téléchargés.</p>
+
+    <div id="ad-slot-hero" class="ad-slot ad-slot-hero" role="complementary" aria-label="Publicité">
+      <div class="ad-slot-inner"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FONCTIONNALITÉS ════════════════════════════════════════════ -->
+<section class="section" id="features">
+  <div class="section-inner">
+    <div class="sec-head reveal">
+      <div>
+        <div class="sec-label" data-i18n="feat.label">Fonctionnalités</div>
+        <h2 class="sec-title"><span class="hl-1" data-i18n="feat.t1">Tout ce qu'il faut,</span><span class="hl-2" data-i18n="feat.t2">rien de superflu.</span></h2>
+      </div>
+      <p class="sec-sub" data-i18n="feat.sub">Un outil simple qui fait une chose et la fait bien : récupérer tes vidéos dans la qualité que tu veux, sans rien installer.</p>
+    </div>
+    <div class="feat-grid reveal">
+      <div class="feat-card">
+        <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="13" height="14" rx="2"/><path d="m15.5 10.5 6-3.5v10l-6-3.5"/></svg></div>
+        <div class="feat-title" data-i18n="f1.t">De la HD à la 4K</div>
+        <div class="feat-desc" data-i18n="f1.d">De 480p à 1080p gratuitement, jusqu'en 4K avec Premium. Le fichier est livré en MP4, lisible sur tous les appareils.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
+        <div class="feat-title" data-i18n="f2.t">Audio MP3</div>
+        <div class="feat-desc" data-i18n="f2.d">Garde uniquement le son, en MP3 haute qualité. Pratique pour la musique, les podcasts et les conférences.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4.5" width="19" height="15" rx="2"/><path d="M7 15h3M13 15h4M7 11.5h6M16 11.5h1"/></svg></div>
+        <div class="feat-title" data-i18n="f3.t">Sous-titres intégrés</div>
+        <div class="feat-desc" data-i18n="f3.d">Ajoute les sous-titres directement dans la vidéo : français, anglais, espagnol, italien, allemand ou arabe.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.12 15.88M14.47 14.48 20 20M8.12 8.12 12 12"/></svg></div>
+        <div class="feat-title" data-i18n="f4.t">Découpage précis</div>
+        <div class="feat-desc" data-i18n="f4.d">Garde seulement le passage qui t'intéresse : indique le début et la fin, le reste n'est pas téléchargé.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21.5s8-3.8 8-9.8V5.2l-8-2.9-8 2.9v6.5c0 6 8 9.8 8 9.8z"/><path d="m9 12 2 2 4-4"/></svg></div>
+        <div class="feat-title" data-i18n="f5.t">Rien n'est conservé</div>
+        <div class="feat-desc" data-i18n="f5.d">Les fichiers sont effacés de nos serveurs dès qu'ils t'ont été envoyés, ou au bout de quelques minutes.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 3.5 2.5 10.8l7.2 2.5 2.5 7.2z"/><path d="M21.5 3.5 9.7 13.3"/></svg></div>
+        <div class="feat-title" data-i18n="f6.t">Aussi sur Telegram</div>
+        <div class="feat-desc" data-i18n="f6.d">Envoie un lien à notre bot Telegram et reçois la vidéo ou l'audio directement dans la conversation.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ COMMENT ÇA MARCHE ══════════════════════════════════════════ -->
+<section class="section" id="how">
+  <div class="section-inner">
+    <div class="sec-head reveal">
+      <div>
+        <div class="sec-label" data-i18n="how.label">Comment ça marche</div>
+        <h2 class="sec-title"><span class="hl-1" data-i18n="how.t1">Trois étapes,</span><span class="hl-2" data-i18n="how.t2">c’est tout.</span></h2>
+      </div>
+      <p class="sec-sub" data-i18n="how.sub">Pas besoin de compte ni d’application : tout se passe sur cette page, depuis ton téléphone ou ton ordinateur.</p>
+    </div>
+    <div class="steps reveal">
+      <div class="step">
+        <span class="step-num">01</span>
+        <div class="step-title" data-i18n="s1.t">Copie le lien</div>
+        <div class="step-desc" data-i18n="s1.d">Sur l'application ou le site de la vidéo, touche « Partager » puis « Copier le lien ».</div>
+      </div>
+      <div class="step">
+        <span class="step-num">02</span>
+        <div class="step-title" data-i18n="s2.t">Colle et choisis</div>
+        <div class="step-desc" data-i18n="s2.d">Colle le lien en haut de cette page, puis choisis la qualité vidéo ou l'audio seul.</div>
+      </div>
+      <div class="step">
+        <span class="step-num">03</span>
+        <div class="step-title" data-i18n="s3.t">Télécharge</div>
+        <div class="step-desc" data-i18n="s3.d">Le fichier est préparé, puis enregistré directement sur ton téléphone ou ton ordinateur.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ TARIFS ═════════════════════════════════════════════════════ -->
+<section class="section" id="pricing">
+  <div class="section-inner">
+    <div class="pricing-layout">
+    <div class="pricing-intro reveal">
+      <div class="sec-label" data-i18n="price.label">Tarifs</div>
+      <h2 class="sec-title"><span class="hl-1" data-i18n="price.t1">Gratuit au départ,</span><span class="hl-2" data-i18n="price.t2">Premium en option.</span></h2>
+      <p class="sec-sub" data-i18n="price.sub">Utilise StreamLoader gratuitement aussi longtemps que tu veux. Premium retire les limites et les publicités.</p>
+    </div>
+    <div class="pricing-grid reveal">
+      <!-- GRATUIT -->
+      <div class="price-card plan-card">
+        <div class="price-badge" data-i18n="pf.badge">Gratuit</div>
+        <div class="price-num" id="homePriceFree">0</div>
+        <div class="price-period" data-i18n="pf.period">Pour toujours, sans carte bancaire</div>
+        <ul class="price-features">
+          <li class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="pf.f1">30 téléchargements par jour</span></li>
+          <li class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="pf.f2">Plus de 1 000 sites pris en charge</span></li>
+          <li class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="pf.f3">Qualité jusqu'à 1080p</span></li>
+          <li class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="pf.f5">Sous-titres : 5 par jour</span></li>
+          <li class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="pf.f6">Découpage vidéo : 3 essais</span></li>
+          <li class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="pf.f7">1 playlist par semaine</span></li>
+          <li class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="pf.f4">Financé par la publicité</span></li>
+        </ul>
+        <button class="btn-price outline" onclick="window.scrollTo({top:0,behavior:'smooth'});document.getElementById('urlInput').focus({preventScroll:true})" data-i18n="pf.btn">Commencer</button>
+      </div>
+      <!-- PREMIUM -->
+      <div class="price-card pro plan-card">
+        <div class="price-badge" data-i18n="pp.badge">Premium</div>
+        <div class="price-num"><span class="plan-price-value premium-starting-price" data-plan-price="monthly">1,50 $</span><span class="price-unit" data-i18n="pp.unit">/ mois</span></div>
+        <!-- Rempli par updatePricingDisplay : prix au mois de l'abonnement d'un an et économie réelle. -->
+        <div class="price-period" id="homeYearlyNote">Abonnement de 1 mois, 6 mois ou 1 an</div>
+        <ul class="price-features">
+          <li class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="pp.f1">Téléchargements illimités</span></li>
+          <li class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="pp.f2">Qualité 4K et audio HD</span></li>
+          <li class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="pp.f3">Aucune publicité</span></li>
+          <li class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="pp.f4">Passage prioritaire aux heures de pointe</span></li>
+          <li class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="pp.f5">Sous-titres illimités</span></li>
+          <li class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="pp.f6">Découpage vidéo illimité</span></li>
+          <li class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="pp.f7">Playlists illimitées</span></li>
+        </ul>
+        <button class="btn-price filled" onclick="openModal('premium','monthly')" data-i18n="pp.btn">Choisir un abonnement</button>
+      </div>
+    </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FAQ ════════════════════════════════════════════════════════ -->
+<section class="section" id="faq">
+  <div class="section-inner">
+    <div class="faq-layout">
+      <div class="reveal">
+        <div class="sec-label" data-i18n="faq.label">Questions fréquentes</div>
+        <h2 class="sec-title"><span class="hl-1" data-i18n="faq.t1">Une question ?</span><span class="hl-2" data-i18n="faq.t2">La réponse est sans doute ici.</span></h2>
+      </div>
+      <div class="faq-list reveal">
+        <details class="faq-item">
+          <summary data-i18n="faq.q1">StreamLoader est-il gratuit ?</summary>
+          <p data-i18n="faq.a1">Oui. Sans rien payer, tu peux faire jusqu'à 30 téléchargements par jour, en qualité jusqu'à 1080p. L'abonnement Premium retire les limites, débloque la 4K et supprime les publicités.</p>
+        </details>
+        <details class="faq-item">
+          <summary data-i18n="faq.q2">Quels sites sont pris en charge ?</summary>
+          <p data-i18n="faq.a2">YouTube, TikTok, Instagram, X (Twitter), Facebook, Vimeo et plus de 1 000 autres sites. Colle simplement le lien : la plupart des vidéos accessibles publiquement sont prises en charge.</p>
+        </details>
+        <details class="faq-item">
+          <summary data-i18n="faq.q3">Ai-je le droit de télécharger n'importe quelle vidéo ?</summary>
+          <p data-i18n="faq.a3">StreamLoader est un outil technique, prévu pour un usage personnel. Tu restes responsable de disposer des droits nécessaires sur les contenus que tu télécharges. Le détail figure dans nos conditions d'utilisation.</p>
+        </details>
+        <details class="faq-item">
+          <summary data-i18n="faq.q4">Mes fichiers sont-ils conservés ?</summary>
+          <p data-i18n="faq.a4">Non. Le fichier est préparé sur nos serveurs le temps du téléchargement, puis supprimé dès qu'il t'a été envoyé. S'il n'est pas récupéré, il est effacé automatiquement au bout de quelques minutes.</p>
+        </details>
+        <details class="faq-item">
+          <summary data-i18n="faq.q5">Comment payer l'abonnement Premium ?</summary>
+          <p data-i18n="faq.a5">Le paiement passe par GeniusPay : Mobile Money (Orange Money, MTN Money, Wave) ou carte bancaire. Ton compte passe en Premium dès que le paiement est confirmé.</p>
+        </details>
+        <details class="faq-item">
+          <summary data-i18n="faq.q6">Le téléchargement ne démarre pas, que faire ?</summary>
+          <p data-i18n="faq.a6">Vérifie que le lien est complet et que la vidéo est publique. Aux heures de forte affluence, ton téléchargement peut patienter quelques instants en file d'attente : il démarre tout seul, garde simplement la page ouverte.</p>
+        </details>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PIED DE PAGE ═══════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a class="nav-logo" href="#" aria-label="StreamLoader">
+          <svg class="brand-mark" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M13 2L4.5 13.5H11L10.5 22L19.5 10.5H13L13 2Z" fill="url(#slBoltFoot)"/><defs><linearGradient id="slBoltFoot" x1="4.5" y1="2" x2="19.5" y2="22" gradientUnits="userSpaceOnUse"><stop stop-color="#C4A5FF"/><stop offset="1" stop-color="#7B5FF5"/></linearGradient></defs></svg>
+          <span>StreamLoader</span>
+        </a>
+        <p class="footer-tagline" data-i18n="foot.tagline">Télécharge tes vidéos et ta musique en un lien, depuis plus de 1 000 sites.</p>
+        <div class="footer-social">
+          <a href="https://t.me/StreamLoade_bot" target="_blank" rel="noopener noreferrer" class="social-icon-btn" aria-label="Telegram">
+            <svg viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+          </a>
+          <a href="https://www.tiktok.com/@steamloader01?_r=1&_t=ZS-99h2zS7Ug0i" target="_blank" rel="noopener noreferrer" class="social-icon-btn" aria-label="TikTok">
+            <svg viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34l-.01-9.27a8.18 8.18 0 0 0 4.78 1.52v-3.45a4.85 4.85 0 0 1-1-.11z"/></svg>
+          </a>
+          <a href="https://www.instagram.com/streamloader2026?stkn=d3h0OGNuYjV4b2Zl&utm_source=qr" target="_blank" rel="noopener noreferrer" class="social-icon-btn" aria-label="Instagram">
+            <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+          </a>
+          <a href="https://www.facebook.com/share/1BHgPzXNws/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" class="social-icon-btn" aria-label="Facebook">
+            <svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          </a>
+          <a href="https://x.com/streamloader?s=11" target="_blank" rel="noopener noreferrer" class="social-icon-btn" aria-label="X (Twitter)">
+            <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h3 data-i18n="foot.product">Produit</h3>
+        <a href="#features" data-i18n="nav.features">Fonctionnalités</a>
+        <a href="#pricing" data-i18n="nav.pricing">Tarifs</a>
+        <a href="#faq" data-i18n="foot.faq">FAQ</a>
+        <a href="https://t.me/StreamLoade_bot" target="_blank" rel="noopener noreferrer" data-i18n="foot.telegram">Bot Telegram</a>
+      </div>
+      <div class="footer-col">
+        <h3 data-i18n="foot.legalTitle">Informations légales</h3>
+        <a href="/mentions-legales.html" data-i18n="foot.legal">Mentions légales</a>
+        <a href="/confidentialite.html" data-i18n="foot.privacy">Confidentialité</a>
+        <a href="/cgv-cgu.html" data-i18n="foot.terms">CGV / CGU</a>
+      </div>
+      <div class="footer-col">
+        <h3 data-i18n="foot.contact">Contact</h3>
+        <a href="mailto:contact@streamloader.com">contact@streamloader.com</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copy" data-i18n="foot.copy">© 2026 StreamLoader · Propulsée par GOD D_PACHA</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══ FENÊTRES : CONNEXION / PREMIUM / COMPTE ═══════════════════ -->
+<div class="modal-backdrop" id="modalBackdrop" onclick="backdropClick(event)">
+  <div class="modal" id="modalBox" role="dialog" aria-modal="true">
+    <button class="modal-close" onclick="closeModal()" aria-label="Fermer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+
+    <!-- Connexion / création de compte -->
+    <div id="panelAuth">
+      <div class="modal-title" id="authTitle" data-i18n="auth.title">Bienvenue</div>
+      <div class="modal-sub" id="authSub" data-i18n="auth.sub">Connecte-toi ou crée un compte.</div>
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tabLogin"    onclick="switchTab('login')"    data-i18n="auth.login">Connexion</button>
+        <button class="auth-tab"        id="tabRegister" onclick="switchTab('register')" data-i18n="auth.register">Créer un compte</button>
+      </div>
+      <div class="field-group">
+        <div>
+          <div class="field-label" data-i18n="auth.email">Email</div>
+          <input class="field-input" type="email" id="authEmail" placeholder="toi@exemple.com" autocomplete="email">
+        </div>
+        <div>
+          <div class="field-label" data-i18n="auth.password">Mot de passe</div>
+          <div class="pwd-field">
+            <input class="field-input" type="password" id="authPwd" placeholder="••••••••" autocomplete="current-password">
+            <!-- onmousedown : le clic sur l'œil ne retire pas le curseur du champ -->
+            <button type="button" class="pwd-toggle" onclick="togglePassword(this)" onmousedown="event.preventDefault()" aria-label="Afficher le mot de passe" aria-pressed="false">
+              <svg class="eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <svg class="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+            </button>
+          </div>
+        </div>
+        <div id="authPwd2Wrap" style="display:none">
+          <div class="field-label" data-i18n="auth.confirm">Confirmer</div>
+          <div class="pwd-field">
+            <input class="field-input" type="password" id="authPwd2" placeholder="••••••••" autocomplete="new-password">
+            <button type="button" class="pwd-toggle" onclick="togglePassword(this)" onmousedown="event.preventDefault()" aria-label="Afficher le mot de passe" aria-pressed="false">
+              <svg class="eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <svg class="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <button class="btn-submit" id="authSubmit" onclick="submitAuth()">
+        <span id="authSubmitLabel" data-i18n="auth.login_btn">Se connecter</span>
+      </button>
+      <div class="auth-error"  id="authErr"></div>
+      <div class="auth-success" id="authOk"></div>
+    </div>
+
+    <!-- Premium (paiement GeniusPay, multi-devises) -->
+    <div id="panelPremium" style="display:none">
+      <div class="prem-modal-header">
+        <div class="prem-kicker">StreamLoader Premium</div>
+        <div class="prem-price-tag">
+          <span id="premPriceVal">900</span> <span class="fcfa" id="premPriceUnit">FCFA</span>
+          <span class="approx" id="premPriceApprox">≈ 1.50 USD</span>
+        </div>
+        <div class="prem-price-sub" id="premPriceSub">Forfait mensuel · Paiement sécurisé</div>
+        <div class="prem-geo">
+          <span id="premGeoIndicator">
+            <span id="premGeoFlag"></span> <span id="premGeoCountry">Détecté : Cameroun</span>
+          </span>
+          <!-- La détection automatique (fuseau horaire / IP) peut se tromper entre
+               pays voisins au même décalage horaire : l'utilisateur peut corriger
+               lui-même, une fois pour toutes (choix mémorisé). -->
+          <button type="button" id="premGeoFixBtn" onclick="toggleCountryPicker()">Pas le bon pays ?</button>
+        </div>
+        <select id="premCountryPicker" onchange="setManualCountry(this.value)" style="display:none">
+          <option value="">Choisis ton pays…</option>
+        </select>
+      </div>
+
+      <div class="plan-switcher" role="tablist" aria-label="Forfait Premium">
+        <!-- Prix au mois et économies calculés depuis les vrais tarifs (updatePricingDisplay).
+             « Meilleur prix » est factuel : c'est l'abonnement le moins cher au mois. -->
+        <button type="button" data-plan-tab="monthly" onclick="selectPlan('monthly')">
+          <span class="plan-name">1 mois</span>
+          <span class="plan-permonth"><span data-plan-permonth="monthly"></span><span>/ mois</span></span>
+        </button>
+        <button type="button" data-plan-tab="halfyearly" onclick="selectPlan('halfyearly')">
+          <span class="plan-name">6 mois</span>
+          <span class="plan-permonth"><span data-plan-permonth="halfyearly"></span><span>/ mois</span></span>
+          <span class="plan-save" data-plan-save="halfyearly"></span>
+        </button>
+        <button type="button" data-plan-tab="yearly" onclick="selectPlan('yearly')">
+          <span class="plan-flag">Meilleur prix</span>
+          <span class="plan-name">1 an</span>
+          <span class="plan-permonth"><span data-plan-permonth="yearly"></span><span>/ mois</span></span>
+          <span class="plan-save" data-plan-save="yearly"></span>
+        </button>
+      </div>
+
+      <div class="prem-benefits-card">
+        <div class="prem-benefit-item">
+          <div class="prem-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <span>Qualité 4K</span>
+        </div>
+        <div class="prem-benefit-item">
+          <div class="prem-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <span>Téléchargements illimités</span>
+        </div>
+        <div class="prem-benefit-item">
+          <div class="prem-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <span>Aucune publicité</span>
+        </div>
+        <div class="prem-benefit-item">
+          <div class="prem-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <span>Passage prioritaire</span>
+        </div>
+      </div>
+
+      <!-- État 1 : utilisateur non connecté -->
+      <div class="prem-guest-box" id="premLoginNotice">
+        <div class="prem-guest-txt">Il te faut un compte pour activer Premium.</div>
+        <div class="prem-guest-actions">
+          <button class="btn-prem-register" onclick="openModal('register')">Créer un compte</button>
+          <button class="btn-prem-login" onclick="openModal('login')">Se connecter</button>
+        </div>
+      </div>
+
+      <!-- État 2 : utilisateur connecté -->
+      <div class="prem-logged-box" id="premLoggedNotice" style="display:none">
+        <span>Compte : <strong id="premLoggedEmail">...</strong></span>
+      </div>
+
+      <!-- Case obligatoire, non pré-cochée : uniquement ici, sur le formulaire
+           de paiement (pas de friction ailleurs sur le site). -->
+      <label class="prem-cgv-check">
+        <input type="checkbox" id="premCgvCheck" onchange="document.getElementById('premErr').style.display='none'">
+        <span>J’accepte les <a href="/cgv-cgu.html" target="_blank" rel="noopener">CGV et CGU</a></span>
+      </label>
+
+      <button class="btn-prem-pay" id="premBtn" onclick="doPremium()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        <span id="premBtnLabel">Payer maintenant</span>
+      </button>
+
+      <div class="prem-security-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10.5" width="16" height="10.5" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg>
+        <span>Paiement sécurisé par GeniusPay</span>
+      </div>
+
+      <div class="auth-error"  id="premErr" style="display:none;margin-top:12px"></div>
+      <div class="auth-success" id="premOk"  style="display:none;margin-top:12px"></div>
+    </div>
+
+    <!-- Compte -->
+    <div id="panelProfile" style="display:none">
+      <div class="modal-title" data-i18n="prof.title">Mon compte</div>
+      <div class="profile-info" style="margin-top:18px">
+        <div class="profile-row"><span data-i18n="prof.email_lbl">Email</span><span id="profEmail"></span></div>
+        <div class="profile-row"><span data-i18n="prof.plan_lbl">Forfait</span><span id="profPlan"></span></div>
+        <div class="profile-since" id="profSince"></div>
+      </div>
+
+      <!-- Clé API — visible uniquement pour les comptes Premium -->
+      <div id="apiKeyBox" class="api-box">
+        <div class="api-box-title">Clé API</div>
+        <div id="apiKeyNoKey" style="display:none">
+          <p>Génère une clé pour intégrer StreamLoader à tes propres scripts (voir la <a href="/llms.txt" target="_blank" rel="noopener">documentation</a>).</p>
+          <button class="btn-price outline btn-sm" onclick="generateApiKey()">Générer ma clé API</button>
+        </div>
+        <div id="apiKeyHasKey" style="display:none">
+          <code id="apiKeyFull" class="api-key"></code>
+          <div id="apiKeyCopyRow" class="btn-row">
+            <button class="btn-price outline btn-sm" onclick="copyApiKey(event)">Copier</button>
+            <button class="btn-price outline btn-sm" id="apiKeyToggleBtn" onclick="toggleApiKeyVisibility()">Afficher</button>
+          </div>
+          <p id="apiKeyLegacyNote" class="api-note" style="display:none">Cette clé a été créée avant la mise à jour : régénère-la une fois pour pouvoir la copier ici à tout moment.</p>
+          <p class="api-note">Créée le <span id="apiKeyDate"></span> · ne la partage avec personne.</p>
+          <div class="btn-row">
+            <button class="btn-price outline btn-sm" onclick="generateApiKey()">Régénérer</button>
+            <button class="btn-price outline btn-sm danger" onclick="revokeApiKey()">Révoquer</button>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-submit" id="profUpgradeBtn" onclick="openModal('premium')" style="margin-bottom:10px;display:none">
+        <span data-i18n="prof.upgrade">Passer Premium</span>
+      </button>
+      <button class="btn-price outline" onclick="logout()" data-i18n="prof.logout">Se déconnecter</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ JAVASCRIPT ═════════════════════════════════════════════════ -->
+<script>
+/* ─── i18n ───────────────────────────────────────────────────────── */
+const TR = {
+  fr:{
+    'brand':'StreamLoader',
+    'nav.features':'Fonctionnalités',
+    'nav.how':'Comment ça marche',
+    'nav.pricing':'Tarifs',
+    'nav.faq':'FAQ',
+    'nav.cta':'Connexion',
+    'hero.line1':'Télécharge tes vidéos',
+    'hero.line2':'à partir d’un simple lien.',
+    'hero.sub':'Colle le lien d’une vidéo YouTube, TikTok, Instagram, X ou Facebook, choisis la qualité, et récupère ton fichier.',
+    'hero.placeholder':'Colle le lien d’une vidéo ou d’une playlist…',
+    'hero.analyze':'Analyser',
+    'hero.supports':'Fonctionne avec',
+    'hero.more':'et 1 000+ autres sites',
+    'hero.disclaimer':'StreamLoader est un outil technique. Vous êtes responsable de disposer des droits nécessaires sur les médias téléchargés.',
+    'card.format':'Format',
+    'card.download':'Télécharger',
+    'card.watch':'Regarder',
+    'card.progress':'Téléchargement en cours…',
+    'card.progress_note':'Le fichier sera enregistré dans tes téléchargements.',
+    'feat.label':'Fonctionnalités',
+    'feat.t1':'Tout ce qu’il faut,',
+    'feat.t2':'rien de superflu.',
+    'feat.sub':'Un outil simple qui fait une chose et la fait bien : récupérer tes vidéos dans la qualité que tu veux, sans rien installer.',
+    'f1.t':'De la HD à la 4K',
+    'f1.d':'De 480p à 1080p gratuitement, jusqu’en 4K avec Premium. Le fichier est livré en MP4, lisible sur tous les appareils.',
+    'f2.t':'Audio MP3',
+    'f2.d':'Garde uniquement le son, en MP3 haute qualité. Pratique pour la musique, les podcasts et les conférences.',
+    'f3.t':'Sous-titres intégrés',
+    'f3.d':'Ajoute les sous-titres directement dans la vidéo : français, anglais, espagnol, italien, allemand ou arabe.',
+    'f4.t':'Découpage précis',
+    'f4.d':'Garde seulement le passage qui t’intéresse : indique le début et la fin, le reste n’est pas téléchargé.',
+    'f5.t':'Rien n’est conservé',
+    'f5.d':'Les fichiers sont effacés de nos serveurs dès qu’ils t’ont été envoyés, ou au bout de quelques minutes.',
+    'f6.t':'Aussi sur Telegram',
+    'f6.d':'Envoie un lien à notre bot Telegram et reçois la vidéo ou l’audio directement dans la conversation.',
+    'how.label':'Comment ça marche',
+    'how.t1':'Trois étapes,',
+    'how.t2':'c’est tout.',
+    'how.sub':'Pas besoin de compte ni d’application : tout se passe sur cette page, depuis ton téléphone ou ton ordinateur.',
+    's1.t':'Copie le lien',
+    's1.d':'Sur l’application ou le site de la vidéo, touche « Partager » puis « Copier le lien ».',
+    's2.t':'Colle et choisis',
+    's2.d':'Colle le lien en haut de cette page, puis choisis la qualité vidéo ou l’audio seul.',
+    's3.t':'Télécharge',
+    's3.d':'Le fichier est préparé, puis enregistré directement sur ton téléphone ou ton ordinateur.',
+    'price.label':'Tarifs',
+    'price.t1':'Gratuit au départ,',
+    'price.t2':'Premium en option.',
+    'price.sub':'Utilise StreamLoader gratuitement aussi longtemps que tu veux. Premium retire les limites et les publicités.',
+    'pf.badge':'Gratuit',
+    'pf.period':'Pour toujours, sans carte bancaire',
+    'pf.f1':'30 téléchargements par jour',
+    'pf.f2':'Plus de 1 000 sites pris en charge',
+    'pf.f3':'Qualité jusqu’à 1080p',
+    'pf.f4':'Financé par la publicité',
+    'pf.f5':'Sous-titres : 5 par jour',
+    'pf.f6':'Découpage vidéo : 3 essais',
+    'pf.f7':'1 playlist par semaine',
+    'pf.btn':'Commencer',
+    'pp.badge':'Premium',
+    'pp.from':'À partir de',
+    'pp.period':'Abonnement de 1 mois, 6 mois ou 1 an',
+    'pp.f1':'Téléchargements illimités',
+    'pp.f2':'Qualité 4K et audio HD',
+    'pp.f3':'Aucune publicité',
+    'pp.f4':'File d’attente prioritaire',
+    'pp.unit':'/ mois',
+    'pp.yearNote':'ou {price} / mois sur un an (−{pct} %)',
+    'pp.f5':'Sous-titres illimités',
+    'pp.f6':'Découpage vidéo illimité',
+    'pp.f7':'Playlists illimitées',
+    'pp.btn':'Choisir un abonnement',
+    'faq.label':'Questions fréquentes',
+    'faq.t1':'Une question ?',
+    'faq.t2':'La réponse est sans doute ici.',
+    'faq.q1':'StreamLoader est-il gratuit ?',
+    'faq.a1':'Oui. Sans rien payer, tu peux faire jusqu’à 30 téléchargements par jour, en qualité jusqu’à 1080p. L’abonnement Premium retire les limites, débloque la 4K et supprime les publicités.',
+    'faq.q2':'Quels sites sont pris en charge ?',
+    'faq.a2':'YouTube, TikTok, Instagram, X (Twitter), Facebook, Vimeo et plus de 1 000 autres sites. Colle simplement le lien : la plupart des vidéos accessibles publiquement sont prises en charge.',
+    'faq.q3':'Ai-je le droit de télécharger n’importe quelle vidéo ?',
+    'faq.a3':'StreamLoader est un outil technique, prévu pour un usage personnel. Tu restes responsable de disposer des droits nécessaires sur les contenus que tu télécharges. Le détail figure dans nos conditions d’utilisation.',
+    'faq.q4':'Mes fichiers sont-ils conservés ?',
+    'faq.a4':'Non. Le fichier est préparé sur nos serveurs le temps du téléchargement, puis supprimé dès qu’il t’a été envoyé. S’il n’est pas récupéré, il est effacé automatiquement au bout de quelques minutes.',
+    'faq.q5':'Comment payer l’abonnement Premium ?',
+    'faq.a5':'Le paiement passe par GeniusPay : Mobile Money (Orange Money, MTN Money, Wave) ou carte bancaire. Ton compte passe en Premium dès que le paiement est confirmé.',
+    'faq.q6':'Le téléchargement ne démarre pas, que faire ?',
+    'faq.a6':'Vérifie que le lien est complet et que la vidéo est publique. Aux heures de forte affluence, ton téléchargement peut patienter quelques instants en file d’attente : il démarre tout seul, garde simplement la page ouverte.',
+    'foot.tagline':'Télécharge tes vidéos et ta musique en un lien, depuis plus de 1 000 sites.',
+    'foot.product':'Produit',
+    'foot.legalTitle':'Informations légales',
+    'foot.telegram':'Bot Telegram',
+    'foot.legal':'Mentions légales',
+    'foot.privacy':'Confidentialité',
+    'foot.terms':'CGV / CGU',
+    'foot.faq':'FAQ',
+    'foot.contact':'Contact',
+    'foot.copy':'© 2026 StreamLoader · Propulsée par GOD D_PACHA',
+    'auth.title':'Bienvenue',
+    'auth.sub':'Connecte-toi ou crée un compte.',
+    'auth.login':'Connexion',
+    'auth.register':'Créer un compte',
+    'auth.email':'Email',
+    'auth.password':'Mot de passe',
+    'auth.confirm':'Confirmer le mot de passe',
+    'auth.login_btn':'Se connecter',
+    'auth.register_btn':'Créer mon compte',
+    'prem.title':'Passer Premium',
+    'prem.sub':'Choisis la durée qui te convient.',
+    'prem.must_login':'Tu dois créer un compte d’abord.',
+    'prem.pay':'Payer et activer',
+    'prem.note':'Paiement sécurisé via GeniusPay.',
+    'prof.title':'Mon compte',
+    'prof.email_lbl':'Email',
+    'prof.plan_lbl':'Forfait',
+    'prof.upgrade':'Passer Premium',
+    'prof.logout':'Se déconnecter',
+    'st.analyzing':'Analyse en cours…',
+    'st.ready':'formats disponibles',
+    'st.err':'Erreur : ',
+    'st.no_url':'Colle un lien valide.',
+    'card.withSubs':'Télécharger avec sous-titres',
+    'card.subsLang':'Langue des sous-titres',
+    'card.subsHint':'Les sous-titres seront intégrés à la vidéo dans la langue choisie, quelle que soit la langue d’origine.',
+    'card.trimToggle':'Extraire une scène précise',
+    'card.trimStart':'Début (ex : 00:10)',
+    'card.trimEnd':'Fin (ex : 00:25)',
+    'pl.kicker':'Playlist',
+    'pl.quality':'Qualité pour toute la playlist',
+    'pl.selectAll':'Tout sélectionner',
+    'pl.stop':'Arrêter',
+    'pl.hint':'Cette vidéo fait partie d’une playlist · Voir toute la playlist',
+    'pl.found':'Playlist trouvée : {n} vidéos disponibles',
+    'pl.videos':'{n} vidéos',
+    'pl.fourK':'La 4K est réservée aux abonnés Premium.',
+    'pl.notePremium':'Premium : playlists illimitées, jusqu’à {max} vidéos par playlist.',
+    'pl.noteGuest':'Crée un compte gratuit pour télécharger une playlist par semaine ({max} vidéos maximum), ou passe au Premium pour des playlists illimitées.',
+    'pl.noteLimit':'Tu as déjà téléchargé une playlist cette semaine avec ton compte gratuit. Prochaine playlist gratuite le {date}, ou tout de suite avec Premium.',
+    'pl.noteFree':'Compte gratuit : une playlist par semaine, {max} vidéos maximum. Premium : playlists illimitées.',
+    'pl.noteTruncated':'Cette playlist contient {total} vidéos : seules les {shown} premières sont proposées.',
+    'pl.noteUnavailable':'{n} vidéo(s) privée(s) ou supprimée(s) ont été écartées.',
+    'pl.noteMulti':'Les vidéos arrivent une par une : si ton navigateur demande l’autorisation de télécharger plusieurs fichiers, accepte-la, et garde cette page ouverte.',
+    'pl.maxReached':'Tu peux sélectionner {max} vidéos au maximum avec ton forfait.',
+    'pl.count':'{n} sur {total} sélectionnées',
+    'pl.start':'Télécharger la sélection ({n})',
+    'pl.itemDone':'Terminé',
+    'pl.itemError':'Échec',
+    'pl.progress':'Vidéo {i} sur {n} — {title}',
+    'pl.preparing':'Préparation…',
+    'pl.pacing':'Petite pause avant la vidéo suivante…',
+    'pl.queued':'En file d’attente (position {pos})',
+    'pl.finalizing':'Finalisation…',
+    'pl.netErr':'Connexion perdue avec le serveur.',
+    'pl.finished':'Playlist terminée : {done} vidéo(s) téléchargée(s).',
+    'pl.finishedWithErrors':'Playlist terminée : {done} téléchargée(s), {failed} en échec.',
+    'pl.stopped':'Playlist arrêtée : {done} vidéo(s) téléchargée(s).',
+    'dl.start':'Téléchargement démarré…',
+    'dl.done':'Téléchargement terminé.',
+    'dl.err':'Erreur de téléchargement.',
+  },
+  en:{
+    'brand':'StreamLoader',
+    'nav.features':'Features',
+    'nav.how':'How it works',
+    'nav.pricing':'Pricing',
+    'nav.faq':'FAQ',
+    'nav.cta':'Log in',
+    'hero.line1':'Download your videos',
+    'hero.line2':'from a single link.',
+    'hero.sub':'Paste a link from YouTube, TikTok, Instagram, X or Facebook, pick the quality, and get your file.',
+    'hero.placeholder':'Paste a video or playlist link…',
+    'hero.analyze':'Analyze',
+    'hero.supports':'Works with',
+    'hero.more':'and 1,000+ other sites',
+    'hero.disclaimer':'StreamLoader is a technical tool. You are responsible for having the necessary rights to the media you download.',
+    'card.format':'Format',
+    'card.download':'Download',
+    'card.watch':'Watch',
+    'card.progress':'Downloading…',
+    'card.progress_note':'The file will be saved to your downloads folder.',
+    'feat.label':'Features',
+    'feat.t1':'Everything you need,',
+    'feat.t2':'nothing you don’t.',
+    'feat.sub':'A simple tool that does one thing well: getting your videos in the quality you want, with nothing to install.',
+    'f1.t':'From HD to 4K',
+    'f1.d':'480p to 1080p for free, up to 4K with Premium. Files are delivered as MP4, playable on any device.',
+    'f2.t':'MP3 audio',
+    'f2.d':'Keep only the sound, as a high-quality MP3. Handy for music, podcasts and talks.',
+    'f3.t':'Built-in subtitles',
+    'f3.d':'Embed subtitles right into the video: French, English, Spanish, Italian, German or Arabic.',
+    'f4.t':'Precise trimming',
+    'f4.d':'Keep only the part you care about: set a start and an end, the rest is never downloaded.',
+    'f5.t':'Nothing is kept',
+    'f5.d':'Files are deleted from our servers as soon as they have been sent to you, or after a few minutes.',
+    'f6.t':'Also on Telegram',
+    'f6.d':'Send a link to our Telegram bot and get the video or audio right in the chat.',
+    'how.label':'How it works',
+    'how.t1':'Three steps,',
+    'how.t2':'that’s it.',
+    'how.sub':'No account and no app needed: everything happens on this page, from your phone or computer.',
+    's1.t':'Copy the link',
+    's1.d':'In the video’s app or website, tap "Share" then "Copy link".',
+    's2.t':'Paste and choose',
+    's2.d':'Paste the link at the top of this page, then pick a video quality or audio only.',
+    's3.t':'Download',
+    's3.d':'The file is prepared, then saved straight to your phone or computer.',
+    'price.label':'Pricing',
+    'price.t1':'Free to start,',
+    'price.t2':'Premium if you want.',
+    'price.sub':'Use StreamLoader for free for as long as you like. Premium removes the limits and the ads.',
+    'pf.badge':'Free',
+    'pf.period':'Forever, no card required',
+    'pf.f1':'30 downloads per day',
+    'pf.f2':'More than 1,000 supported sites',
+    'pf.f3':'Quality up to 1080p',
+    'pf.f4':'Ad-supported',
+    'pf.f5':'Subtitles: 5 per day',
+    'pf.f6':'Video trimming: 3 trials',
+    'pf.f7':'1 playlist per week',
+    'pf.btn':'Get started',
+    'pp.badge':'Premium',
+    'pp.from':'From',
+    'pp.period':'1-month, 6-month or 1-year plans',
+    'pp.f1':'Unlimited downloads',
+    'pp.f2':'4K quality and HD audio',
+    'pp.f3':'No ads',
+    'pp.f4':'Priority queue',
+    'pp.unit':'/ month',
+    'pp.yearNote':'or {price} / month over a year (−{pct}%)',
+    'pp.f5':'Unlimited subtitles',
+    'pp.f6':'Unlimited video trimming',
+    'pp.f7':'Unlimited playlists',
+    'pp.btn':'Choose a plan',
+    'faq.label':'Frequently asked questions',
+    'faq.t1':'Got a question?',
+    'faq.t2':'The answer is probably here.',
+    'faq.q1':'Is StreamLoader free?',
+    'faq.a1':'Yes. Without paying anything, you get up to 30 downloads per day in up to 1080p. A Premium plan removes the limits, unlocks 4K and removes ads.',
+    'faq.q2':'Which sites are supported?',
+    'faq.a2':'YouTube, TikTok, Instagram, X (Twitter), Facebook, Vimeo and more than 1,000 other sites. Just paste the link: most publicly accessible videos are supported.',
+    'faq.q3':'Am I allowed to download any video?',
+    'faq.a3':'StreamLoader is a technical tool intended for personal use. You remain responsible for having the necessary rights to the content you download. Details are in our terms of use.',
+    'faq.q4':'Are my files kept?',
+    'faq.a4':'No. The file is prepared on our servers for the time of the download, then deleted as soon as it has been sent to you. If it is not collected, it is erased automatically after a few minutes.',
+    'faq.q5':'How do I pay for Premium?',
+    'faq.a5':'Payments go through GeniusPay: Mobile Money (Orange Money, MTN Money, Wave) or bank card. Your account becomes Premium as soon as the payment is confirmed.',
+    'faq.q6':'The download won’t start, what should I do?',
+    'faq.a6':'Check that the link is complete and the video is public. At busy times your download may wait in a queue for a moment: it starts on its own, just keep the page open.',
+    'foot.tagline':'Download your videos and music from a single link, from more than 1,000 sites.',
+    'foot.product':'Product',
+    'foot.legalTitle':'Legal',
+    'foot.telegram':'Telegram bot',
+    'foot.legal':'Legal notice',
+    'foot.privacy':'Privacy',
+    'foot.terms':'Terms',
+    'foot.faq':'FAQ',
+    'foot.contact':'Contact',
+    'foot.copy':'© 2026 StreamLoader · Powered by GOD D_PACHA',
+    'auth.title':'Welcome',
+    'auth.sub':'Log in or create an account.',
+    'auth.login':'Log in',
+    'auth.register':'Create account',
+    'auth.email':'Email',
+    'auth.password':'Password',
+    'auth.confirm':'Confirm password',
+    'auth.login_btn':'Log in',
+    'auth.register_btn':'Create my account',
+    'prem.title':'Go Premium',
+    'prem.sub':'Choose the duration that suits you.',
+    'prem.must_login':'Please create an account first.',
+    'prem.pay':'Pay and activate',
+    'prem.note':'Secure payment via GeniusPay.',
+    'prof.title':'My account',
+    'prof.email_lbl':'Email',
+    'prof.plan_lbl':'Plan',
+    'prof.upgrade':'Go Premium',
+    'prof.logout':'Log out',
+    'st.analyzing':'Analyzing…',
+    'st.ready':'formats available',
+    'st.err':'Error: ',
+    'st.no_url':'Paste a valid link.',
+    'card.withSubs':'Download with subtitles',
+    'card.subsLang':'Subtitle language',
+    'card.subsHint':'Subtitles will be embedded in the video in the chosen language, whatever the original language.',
+    'card.trimToggle':'Extract a specific scene',
+    'card.trimStart':'Start (e.g. 00:10)',
+    'card.trimEnd':'End (e.g. 00:25)',
+    'pl.kicker':'Playlist',
+    'pl.quality':'Quality for the whole playlist',
+    'pl.selectAll':'Select all',
+    'pl.stop':'Stop',
+    'pl.hint':'This video is part of a playlist · See the whole playlist',
+    'pl.found':'Playlist found: {n} videos available',
+    'pl.videos':'{n} videos',
+    'pl.fourK':'4K is reserved for Premium subscribers.',
+    'pl.notePremium':'Premium: unlimited playlists, up to {max} videos per playlist.',
+    'pl.noteGuest':'Create a free account to download one playlist per week ({max} videos max), or go Premium for unlimited playlists.',
+    'pl.noteLimit':'You already downloaded a playlist this week with your free account. Next free playlist on {date}, or right now with Premium.',
+    'pl.noteFree':'Free account: one playlist per week, {max} videos max. Premium: unlimited playlists.',
+    'pl.noteTruncated':'This playlist has {total} videos: only the first {shown} are offered.',
+    'pl.noteUnavailable':'{n} private or deleted video(s) were left out.',
+    'pl.noteMulti':'Videos arrive one by one: if your browser asks for permission to download multiple files, accept it, and keep this page open.',
+    'pl.maxReached':'You can select up to {max} videos with your plan.',
+    'pl.count':'{n} of {total} selected',
+    'pl.start':'Download selection ({n})',
+    'pl.itemDone':'Done',
+    'pl.itemError':'Failed',
+    'pl.progress':'Video {i} of {n} — {title}',
+    'pl.preparing':'Preparing…',
+    'pl.pacing':'Short pause before the next video…',
+    'pl.queued':'In queue (position {pos})',
+    'pl.finalizing':'Finalizing…',
+    'pl.netErr':'Connection to the server was lost.',
+    'pl.finished':'Playlist complete: {done} video(s) downloaded.',
+    'pl.finishedWithErrors':'Playlist complete: {done} downloaded, {failed} failed.',
+    'pl.stopped':'Playlist stopped: {done} video(s) downloaded.',
+    'dl.start':'Download started…',
+    'dl.done':'Download complete.',
+    'dl.err':'Download error.',
+  },
+  es:{
+    'brand':'StreamLoader','nav.cta':'Entrar','hero.line1':'Descarga vídeos','hero.line2':'sin límites.',
+    'hero.placeholder':'Pega la URL aquí…','hero.analyze':'Analizar','hero.supports':'Compatible con:','hero.more':'+1000 más','hero.disclaimer':'StreamLoader es una herramienta técnica. Eres responsable de disponer de los derechos necesarios sobre los medios descargados.',
+    'card.download':'Descargar','card.watch':'Ver','card.progress':'Descargando…',
+    'pf.badge':'Gratis','pf.period':'Para siempre','pf.f1':'30 descargas al día','pf.f2':'Más de 1000 sitios','pf.f3':'Calidad hasta 1080p','pf.f4':'Con anuncios','pf.f5':'Subtítulos: 5 descargas por día','pf.f6':'Recorte de vídeo a medida: 3 intentos','pf.btn':'Comenzar',
+    'pp.badge':'Premium','pp.from':'Desde','pp.unit':'/ mes','pp.yearNote':'o {price} / mes en un año (−{pct} %)','pp.period':'Suscripción de 1 mes, 6 meses o 1 año','pp.f1':'Descargas ilimitadas','pp.f2':'4K + Audio HD','pp.f3':'Sin anuncios','pp.f4':'Servidor prioritario','pp.f5':'Subtítulos ilimitados','pp.f6':'Recorte de vídeo a medida ilimitado','pp.btn':'Ir Premium',
+    'prem.pay':'Pagar 2€ y activar','auth.login_btn':'Iniciar sesión','auth.register_btn':'Crear cuenta','prof.logout':'Cerrar sesión',
+    'st.analyzing':'Analizando…','st.ready':'formatos disponibles','st.err':'Error: ','st.no_url':'Introduce una URL válida.',
+    'card.withSubs':'Descargar con subtítulos','card.subsLang':'Idioma de los subtítulos','card.subsHint':'Los subtítulos se integrarán en el vídeo en el idioma elegido.',
+    'card.trimToggle':'Extraer una escena precisa','card.trimStart':'Inicio (ej: 00:10)','card.trimEnd':'Fin (ej: 00:25)',
+    'dl.start':'Descarga iniciada…','dl.done':'¡Descarga completa!',
+  },
+  pt:{
+    'brand':'StreamLoader','nav.cta':'Entrar','hero.line1':'Baixe vídeos','hero.line2':'sem limites.',
+    'hero.placeholder':'Cole a URL aqui…','hero.analyze':'Analisar','hero.supports':'Compatível com:','hero.more':'+1000 outros','hero.disclaimer':'StreamLoader é uma ferramenta técnica. Você é responsável por ter os direitos necessários sobre as mídias baixadas.',
+    'card.download':'Baixar','card.watch':'Assistir','card.progress':'Baixando…',
+    'pf.badge':'Grátis','pf.period':'Para sempre','pf.f1':'30 downloads por dia','pf.f2':'Mais de 1000 sites','pf.f3':'Qualidade até 1080p','pf.f4':'Com anúncios','pf.f5':'Legendas: 5 downloads por dia','pf.f6':'Corte de vídeo personalizado: 3 tentativas','pf.btn':'Começar',
+    'pp.badge':'Premium','pp.from':'A partir de','pp.unit':'/ mês','pp.yearNote':'ou {price} / mês em um ano (−{pct} %)','pp.period':'Assinatura de 1 mês, 6 meses ou 1 ano','pp.f1':'Downloads ilimitados','pp.f2':'4K + Áudio HD','pp.f3':'Sem anúncios','pp.f4':'Servidor prioritário','pp.f5':'Legendas ilimitadas','pp.f6':'Corte de vídeo personalizado ilimitado','pp.btn':'Ir Premium',
+    'prem.pay':'Pagar 2€ e ativar','auth.login_btn':'Entrar','auth.register_btn':'Criar conta','prof.logout':'Sair',
+    'st.analyzing':'Analisando…','st.ready':'formatos disponíveis','st.err':'Erro: ','st.no_url':'Cole uma URL válida.',
+    'card.withSubs':'Baixar com legendas','card.subsLang':'Idioma das legendas','card.subsHint':'As legendas serão incorporadas ao vídeo no idioma escolhido.',
+    'card.trimToggle':'Extrair uma cena precisa','card.trimStart':'Início (ex: 00:10)','card.trimEnd':'Fim (ex: 00:25)',
+    'dl.start':'Download iniciado…','dl.done':'Download concluído!',
+  },
+  ar:{
+    'brand':'StreamLoader','nav.cta':'تسجيل الدخول','hero.line1':'حمّل مقاطع الفيديو','hero.line2':'بلا حدود.',
+    'hero.placeholder':'الصق الرابط هنا…','hero.analyze':'تحليل','hero.supports':'متوافق مع:','hero.more':'+1000 موقع','hero.disclaimer':'StreamLoader أداة تقنية. أنت المسؤول عن امتلاك الحقوق اللازمة للوسائط التي تقوم بتنزيلها.',
+    'card.download':'تحميل','card.watch':'مشاهدة','card.progress':'جارٍ التحميل…',
+    'pf.badge':'مجاني','pf.period':'إلى الأبد','pf.f1':'30 تحميلاً في اليوم','pf.f2':'أكثر من 1000 موقع','pf.f3':'جودة حتى 1080p','pf.f4':'مع إعلانات','pf.f5':'الترجمة: 5 تحميلات يوميًا','pf.f6':'اقتصاص الفيديو المخصص: 3 محاولات','pf.btn':'ابدأ الآن',
+    'pp.badge':'بريميوم','pp.from':'ابتداءً من','pp.unit':'/ شهر','pp.yearNote':'أو {price} / شهر على مدى سنة (−{pct}٪)','pp.period':'اشتراك لمدة شهر أو 6 أشهر أو سنة','pp.f1':'تحميلات غير محدودة','pp.f2':'4K + صوت HD','pp.f3':'بدون إعلانات','pp.f4':'أولوية الخادم','pp.f5':'ترجمة غير محدودة','pp.f6':'اقتصاص فيديو مخصص غير محدود','pp.btn':'الترقية',
+    'prem.pay':'دفع 2€ وتفعيل','auth.login_btn':'تسجيل الدخول','auth.register_btn':'إنشاء حساب','prof.logout':'تسجيل الخروج',
+    'st.analyzing':'جارٍ التحليل…','st.ready':'صيغة متاحة','st.err':'خطأ: ','st.no_url':'أدخل رابطاً صحيحاً.',
+    'card.withSubs':'تحميل مع الترجمة','card.subsLang':'لغة الترجمة','card.subsHint':'سيتم دمج الترجمة في الفيديو باللغة المختارة.',
+    'card.trimToggle':'استخراج مشهد محدد','card.trimStart':'البداية (مثال: 00:10)','card.trimEnd':'النهاية (مثال: 00:25)',
+    'dl.start':'بدأ التحميل…','dl.done':'اكتمل التحميل!',
+  }
+};
+const LANGS = ['fr','en','es','pt','ar'];
+let lang = 'fr';
+function detectLang() {
+  const l = (navigator.language||'fr').split('-')[0].toLowerCase();
+  return LANGS.includes(l) ? l : 'fr';
+}
+function t(k) { return (TR[lang]||TR.fr)[k] || (TR.fr)[k] || k; }
+function applyI18n() {
+  document.querySelectorAll('[data-i18n]').forEach(el => { const v=t(el.dataset.i18n); if(v) el.textContent=v; });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { const v=t(el.dataset.i18nPlaceholder); if(v) el.placeholder=v; });
+  document.getElementById('langLabel').textContent = lang.toUpperCase();
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang==='ar'?'rtl':'ltr';
+}
+document.getElementById('langBtn').addEventListener('click', () => {
+  lang = LANGS[(LANGS.indexOf(lang)+1)%LANGS.length];
+  applyI18n();
+  updatePricingDisplay(); // prix et mentions tarifaires dans la nouvelle langue
+});
+
+/* ─── Theme ──────────────────────────────────────────────────────── */
+function applyTheme(th) {
+  if (th) { document.documentElement.setAttribute('data-theme', th); localStorage.setItem('sl-th', th); }
+  else    { document.documentElement.removeAttribute('data-theme'); localStorage.removeItem('sl-th'); }
+}
+document.getElementById('themeBtn').addEventListener('click', () => {
+  const cur = localStorage.getItem('sl-th');
+  const sys = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  if (!cur) applyTheme(sys==='dark'?'light':'dark');
+  else if (cur==='dark') applyTheme('light');
+  else applyTheme(null);
+});
+const savedTh = localStorage.getItem('sl-th');
+if (savedTh) applyTheme(savedTh);
+
+/* ─── Auth state ─────────────────────────────────────────────────── */
+let token = localStorage.getItem('sl-tok') || null;
+let currentUser = null;
+const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+
+async function loadUser() {
+  if (!token) return;
+  try {
+    const r = await fetch('/api/auth/me', { headers: { 'Authorization': 'Bearer '+token } });
+    if (!r.ok) { token=null; localStorage.removeItem('sl-tok'); return; }
+    const d = await r.json();
+    currentUser = d.user;
+    updateNavUser();
+  } catch { token=null; localStorage.removeItem('sl-tok'); }
+}
+
+// ── Gestion de la visibilité des publicités ───────────────────────
+function updateAdVisibility() {
+  const isPremium = currentUser?.plan === 'premium';
+  const slots = document.querySelectorAll('.ad-slot');
+
+  // Visible si une publicité y est chargée, ou (hors production) comme cadre vide.
+  slots.forEach(slot => {
+    const ready = slot.classList.contains('ad-loaded') || slot.classList.contains('ad-empty');
+    slot.style.display = !isPremium && ready ? 'block' : 'none';
+  });
+  if (!isPremium) loadAdScripts();
+}
+
+// Scripts insérés via innerHTML ne s'exécutent pas : on les recrée un par un.
+function injectAdHtml(container, html) {
+  container.innerHTML = html;
+  container.querySelectorAll('script').forEach(old => {
+    const s = document.createElement('script');
+    for (const { name, value } of old.attributes) s.setAttribute(name, value);
+    s.text = old.text;
+    old.replaceWith(s);
+  });
+}
+
+// Codes des bannières (ex. Monetag) collés dans les fichiers du dossier ads/ côté
+// serveur ; chargés une seule fois, jamais pour Premium. Sur petit écran, le
+// cadre est plus petit : on prend le code « mobile » s'il existe, sinon le code normal.
+let _adScriptsLoaded = false;
+async function loadAdScripts() {
+  if (_adScriptsLoaded) return;
+  _adScriptsLoaded = true;
+  let banners = {};
+  try { banners = await (await fetch('/api/ads/banners')).json(); } catch { return; }
+  if (currentUser?.plan === 'premium') return;
+  const small = (query) => window.matchMedia(query).matches;
+  const codeBySlot = {
+    'ad-slot-hero': (small('(max-width: 800px)') && banners.heroMobile) || banners.hero,
+    'ad-slot-card': (small('(max-width: 560px)') && banners.cardMobile) || banners.card,
+  };
+  document.querySelectorAll('.ad-slot').forEach(slot => {
+    const inner = slot.querySelector('.ad-slot-inner');
+    const code = codeBySlot[slot.id];
+    if (!inner) return;
+    if (code) {
+      injectAdHtml(inner, code);
+      slot.classList.add('ad-loaded');
+    } else if (banners.showEmpty) {
+      slot.classList.add('ad-empty');
+    } else {
+      return;
+    }
+    slot.style.display = 'block';
+  });
+}
+
+function updateNavUser() {
+  const cta = document.getElementById('navCta');
+  const chip = document.getElementById('navUserChip');
+  if (!currentUser) {
+    cta.style.display='';
+    chip.style.display='none';
+  } else {
+    cta.style.display='none';
+    chip.style.display='flex';
+    document.getElementById('navEmail').textContent = currentUser.email.split('@')[0];
+    document.getElementById('navAvatar').textContent = currentUser.email[0].toUpperCase();
+    const pb = document.getElementById('navPlan');
+    if (currentUser.plan==='premium') { pb.style.display='inline'; } else { pb.style.display='none'; }
+  }
+  // Un abonné n'a pas à revoir l'offre : la section Tarifs et ses liens sont
+  // masqués tant qu'il est Premium, et reviennent d'eux-mêmes à l'échéance
+  // (le serveur renvoie alors plan = 'free').
+  document.body.classList.toggle('is-premium', currentUser?.plan === 'premium');
+  updateAdVisibility();
+  updateTrimUI();
+  // Connexion / déconnexion : les droits « playlist » changent (nombre de vidéos, 4K).
+  if (currentPlaylist && !playlistRun) renderPlaylist(currentPlaylist.raw, { scroll: false });
+}
+
+function logout() {
+  token=null; currentUser=null;
+  localStorage.removeItem('sl-tok');
+  updateNavUser();
+  closeModal();
+}
+
+/* ─── Modal ──────────────────────────────────────────────────────── */
+let modalMode = 'login';
+let authTab = 'login';
+
+function openModal(mode, plan = selectedPlan) {
+  modalMode = mode;
+  if (mode === 'premium') selectPlan(plan);
+  const backdrop = document.getElementById('modalBackdrop');
+  ['panelAuth','panelPremium','panelProfile'].forEach(id => document.getElementById(id).style.display='none');
+  ['authErr','authOk','premErr','premOk'].forEach(id => { const el=document.getElementById(id); el.style.display='none'; el.textContent=''; });
+
+  if (mode==='login' || mode==='register') {
+    document.getElementById('panelAuth').style.display='';
+    switchTab(mode==='register'?'register':'login');
+  } else if (mode==='premium') {
+    document.getElementById('panelPremium').style.display='';
+    const isLogged = !!currentUser;
+    document.getElementById('premLoginNotice').style.display = isLogged ? 'none' : 'block';
+    const loggedNotice = document.getElementById('premLoggedNotice');
+    if (loggedNotice) {
+      loggedNotice.style.display = isLogged ? 'flex' : 'none';
+      if (isLogged) {
+        document.getElementById('premLoggedEmail').textContent = currentUser.email;
+      }
+    }
+    const pb = document.getElementById('premBtn');
+    pb.disabled = !isLogged;
+  } else if (mode==='profile') {
+    document.getElementById('panelProfile').style.display='';
+    document.getElementById('profEmail').textContent = currentUser?.email || '';
+    document.getElementById('profPlan').textContent = currentUser?.plan==='premium' ? 'Premium' : 'Gratuit';
+    document.getElementById('profUpgradeBtn').style.display = currentUser?.plan==='premium' ? 'none' : '';
+    if (currentUser?.created_at) {
+      const d = new Date(currentUser.created_at);
+      document.getElementById('profSince').textContent = 'Membre depuis le '+d.toLocaleDateString(lang);
+    }
+    loadApiKeyBox();
+  }
+
+  backdrop.classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modalBackdrop').classList.remove('open');
+  hidePasswords();
+}
+
+/* ─── Afficher / masquer le mot de passe (bouton « œil ») ─────────── */
+function setPasswordVisible(btn, visible) {
+  const input = btn.parentElement.querySelector('input');
+  input.type = visible ? 'text' : 'password';
+  btn.setAttribute('aria-pressed', String(visible));
+  btn.setAttribute('aria-label', visible ? 'Masquer le mot de passe' : 'Afficher le mot de passe');
+}
+function togglePassword(btn) {
+  setPasswordVisible(btn, btn.getAttribute('aria-pressed') !== 'true');
+}
+// Un mot de passe affiché ne doit pas le rester une fois la fenêtre fermée.
+function hidePasswords() {
+  document.querySelectorAll('.pwd-toggle').forEach(btn => setPasswordVisible(btn, false));
+}
+function backdropClick(e) { if (e.target===document.getElementById('modalBackdrop')) closeModal(); }
+
+/* ─── Clé API Premium ────────────────────────────────────────────── */
+async function loadApiKeyBox() {
+  const box = document.getElementById('apiKeyBox');
+  if (!box) return;
+  if (!currentUser || currentUser.plan !== 'premium') { box.style.display = 'none'; return; }
+
+  box.style.display = 'block';
+  currentApiKey = null;
+  apiKeyVisible = false;
+  try {
+    const r = await fetch('/api/account/api-key', { headers: { Authorization: 'Bearer ' + token } });
+    const d = await r.json();
+    document.getElementById('apiKeyNoKey').style.display = d.hasKey ? 'none' : 'block';
+    document.getElementById('apiKeyHasKey').style.display = d.hasKey ? 'block' : 'none';
+    if (d.hasKey) {
+      currentApiKey = d.apiKey || null;
+      document.getElementById('apiKeyCopyRow').style.display = currentApiKey ? 'flex' : 'none';
+      document.getElementById('apiKeyLegacyNote').style.display = currentApiKey ? 'none' : 'block';
+      document.getElementById('apiKeyFull').dataset.prefix = d.prefix || '';
+      renderApiKey();
+      document.getElementById('apiKeyDate').textContent = d.createdAt
+        ? new Date(d.createdAt.replace(' ', 'T') + 'Z').toLocaleDateString(lang)
+        : '';
+    }
+  } catch {}
+}
+
+let currentApiKey = null;
+let apiKeyVisible = false;
+
+function renderApiKey() {
+  const el = document.getElementById('apiKeyFull');
+  if (!currentApiKey) { el.textContent = el.dataset.prefix || ''; return; }
+  el.textContent = apiKeyVisible ? currentApiKey : currentApiKey.slice(0, 12) + '•'.repeat(24);
+  document.getElementById('apiKeyToggleBtn').textContent = apiKeyVisible ? 'Masquer' : 'Afficher';
+}
+
+function toggleApiKeyVisibility() {
+  apiKeyVisible = !apiKeyVisible;
+  renderApiKey();
+}
+
+async function generateApiKey() {
+  if (!confirm('Générer une nouvelle clé invalidera immédiatement l\'ancienne (si tu en avais une). Continuer ?')) return;
+  try {
+    const r = await fetch('/api/account/api-key', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + token },
+    });
+    const d = await r.json();
+    if (!r.ok) { alert(d.error || 'Erreur lors de la génération de la clé.'); return; }
+    await loadApiKeyBox();
+  } catch { alert('Erreur réseau.'); }
+}
+
+async function revokeApiKey() {
+  if (!confirm('Révoquer ta clé API ? Toute intégration utilisant cette clé cessera de fonctionner immédiatement.')) return;
+  try {
+    await fetch('/api/account/api-key', { method: 'DELETE', headers: { Authorization: 'Bearer ' + token } });
+    loadApiKeyBox();
+  } catch {}
+}
+
+// navigator.clipboard n'existe qu'en HTTPS (ou localhost) : sur un site en
+// HTTP simple, on repasse par l'ancienne méthode execCommand('copy').
+function copyTextToClipboard(text) {
+  if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+  return new Promise((resolve, reject) => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
+    document.body.appendChild(ta);
+    ta.select();
+    ta.setSelectionRange(0, text.length);
+    const ok = document.execCommand('copy');
+    document.body.removeChild(ta);
+    ok ? resolve() : reject(new Error('copy failed'));
+  });
+}
+
+function copyApiKey(event) {
+  if (!currentApiKey) return;
+  const btn = event?.target?.closest('button');
+  const flash = (label) => {
+    if (!btn) return;
+    btn.textContent = label;
+    setTimeout(() => { btn.textContent = 'Copier'; }, 1500);
+  };
+  copyTextToClipboard(currentApiKey)
+    .then(() => flash('Copié !'))
+    .catch(() => {
+      apiKeyVisible = true;
+      renderApiKey();
+      flash('Sélectionne-la et copie-la');
+    });
+}
+
+function switchTab(tab) {
+  authTab = tab;
+  document.getElementById('tabLogin').classList.toggle('active', tab==='login');
+  document.getElementById('tabRegister').classList.toggle('active', tab==='register');
+  document.getElementById('authPwd2Wrap').style.display = tab==='register' ? '' : 'none';
+  document.getElementById('authSubmitLabel').textContent = t(tab==='login'?'auth.login_btn':'auth.register_btn');
+  ['authErr','authOk'].forEach(id => { const el=document.getElementById(id); el.style.display='none'; el.textContent=''; });
+}
+
+async function submitAuth() {
+  const email = document.getElementById('authEmail').value.trim();
+  const pwd   = document.getElementById('authPwd').value;
+  const pwd2  = document.getElementById('authPwd2').value;
+  const errEl = document.getElementById('authErr');
+  const okEl  = document.getElementById('authOk');
+  const btn   = document.getElementById('authSubmit');
+
+  errEl.style.display='none'; okEl.style.display='none';
+  if (!email || !pwd) { errEl.textContent='Remplis tous les champs.'; errEl.style.display='block'; return; }
+  if (authTab==='register' && pwd!==pwd2) { errEl.textContent='Les mots de passe ne correspondent pas.'; errEl.style.display='block'; return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span>';
+
+  const endpoint = authTab==='login' ? '/api/auth/login' : '/api/auth/register';
+  try {
+    const r = await fetch(endpoint, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ email, password: pwd })
+    });
+    const d = await r.json();
+    if (!r.ok) { errEl.textContent = d.error || 'Erreur'; errEl.style.display='block'; return; }
+    token = d.token;
+    currentUser = d.user;
+    localStorage.setItem('sl-tok', token);
+    updateNavUser();
+    if (authTab === 'login') {
+      okEl.textContent = 'Connexion réussie.';
+      okEl.style.display = 'block';
+      setTimeout(closeModal, 1000);
+    } else {
+      okEl.innerHTML = 'Compte créé. <button class="link-btn" onclick="openModal(\'premium\')">Découvrir Premium</button>';
+      okEl.style.display = 'block';
+      setTimeout(closeModal, 2000);
+    }
+  } catch { errEl.textContent='Erreur réseau.'; errEl.style.display='block'; }
+  finally { btn.disabled=false; btn.innerHTML='<span id="authSubmitLabel">'+t(authTab==='login'?'auth.login_btn':'auth.register_btn')+'</span>'; }
+}
+
+/* ─── Multi-devises & Géo-détection Automatique ───────────────────── */
+const CURRENCIES = {
+  XAF: { symbol: 'FCFA', amount: 1200, formatted: '1 200 FCFA', approx: '≈ 2€', flag: '🇨🇲', country: 'Cameroun / Afrique Centrale' },
+  XOF: { symbol: 'FCFA', amount: 1200, formatted: '1 200 FCFA', approx: '≈ 2€', flag: '🇨🇮', country: 'Côte d\'Ivoire / Afrique de l\'Ouest' },
+  EUR: { symbol: '€', amount: 1.99, formatted: '1,99 €', approx: '≈ 1 200 FCFA', flag: '🇪🇺', country: 'France / Europe' },
+  USD: { symbol: '$', amount: 1.99, formatted: '$1.99 USD', approx: '≈ 1 200 FCFA', flag: '🇺🇸', country: 'États-Unis / International' },
+  CAD: { symbol: '$ CAD', amount: 2.99, formatted: '2,99 $ CAD', approx: '≈ 2€', flag: '🇨🇦', country: 'Canada' },
+  GBP: { symbol: '£', amount: 1.99, formatted: '£1.99', approx: '≈ 2€', flag: '🇬🇧', country: 'Royaume-Uni' },
+  NGN: { symbol: '₦', amount: 3000, formatted: '₦3 000', approx: '≈ 2€', flag: '🇳🇬', country: 'Nigeria' },
+  GHS: { symbol: 'GH₵', amount: 25, formatted: 'GH₵ 25', approx: '≈ 2€', flag: '🇬🇭', country: 'Ghana' },
+  CDF: { symbol: 'CDF', amount: 5500, formatted: '5 500 CDF', approx: '≈ 2€', flag: '🇨🇩', country: 'RD Congo' },
+  MAD: { symbol: 'MAD', amount: 20, formatted: '20 MAD', approx: '≈ 2€', flag: '🇲🇦', country: 'Maroc' },
+  DZD: { symbol: 'DZD', amount: 290, formatted: '290 DZD', approx: '≈ 2€', flag: '🇩🇿', country: 'Algérie' },
+  TND: { symbol: 'TND', amount: 6.5, formatted: '6,5 TND', approx: '≈ 2€', flag: '🇹🇳', country: 'Tunisie' },
+  GNF: { symbol: 'GNF', amount: 17500, formatted: '17 500 GNF', approx: '≈ 2€', flag: '🇬🇳', country: 'Guinée' },
+  CHF: { symbol: 'CHF', amount: 2.00, formatted: '2.00 CHF', approx: '≈ 2€', flag: '🇨🇭', country: 'Suisse' },
+  ZAR: { symbol: 'ZAR', amount: 39, formatted: 'R 39', approx: '≈ 2€', flag: '🇿🇦', country: 'Afrique du Sud' },
+  BRL: { symbol: 'R$', amount: 9.99, formatted: 'R$ 9,99', approx: '≈ 2€', flag: '🇧🇷', country: 'Brésil' },
+  INR: { symbol: '₹', amount: 179, formatted: '₹ 179', approx: '≈ 2€', flag: '🇮🇳', country: 'Inde' },
+};
+
+const TIMEZONE_MAP = {
+  // Afrique Centrale (XAF)
+  'Africa/Douala': 'XAF', 'Africa/Libreville': 'XAF', 'Africa/Brazzaville': 'XAF', 'Africa/Ndjamena': 'XAF', 'Africa/Bangui': 'XAF', 'Africa/Malabo': 'XAF',
+  // Afrique de l'Ouest (XOF)
+  'Africa/Abidjan': 'XOF', 'Africa/Dakar': 'XOF', 'Africa/Bamako': 'XOF', 'Africa/Ouagadougou': 'XOF', 'Africa/Cotonou': 'XOF', 'Africa/Lome': 'XOF', 'Africa/Niamey': 'XOF', 'Africa/Bissau': 'XOF',
+  // Afrique Autres
+  'Africa/Lagos': 'NGN', 'Africa/Accra': 'GHS', 'Africa/Kinshasa': 'CDF', 'Africa/Lubumbashi': 'CDF', 'Africa/Conakry': 'GNF',
+  'Africa/Casablanca': 'MAD', 'Africa/Algiers': 'DZD', 'Africa/Tunis': 'TND', 'Africa/Johannesburg': 'ZAR',
+  // Europe (EUR / GBP / CHF)
+  'Europe/Paris': 'EUR', 'Europe/Brussels': 'EUR', 'Europe/Berlin': 'EUR', 'Europe/Madrid': 'EUR', 'Europe/Rome': 'EUR', 'Europe/Lisbon': 'EUR', 'Europe/Amsterdam': 'EUR', 'Europe/Vienna': 'EUR', 'Europe/Dublin': 'EUR', 'Europe/Luxembourg': 'EUR',
+  'Europe/London': 'GBP', 'Europe/Zurich': 'CHF',
+  // Amérique du Nord (CAD / USD)
+  'America/Toronto': 'CAD', 'America/Montreal': 'CAD', 'America/Vancouver': 'CAD', 'America/Edmonton': 'CAD', 'America/Winnipeg': 'CAD', 'America/Halifax': 'CAD',
+  'America/New_York': 'USD', 'America/Chicago': 'USD', 'America/Denver': 'USD', 'America/Los_Angeles': 'USD', 'America/Phoenix': 'USD', 'America/Anchorage': 'USD', 'America/Honolulu': 'USD',
+  // Autres
+  'America/Sao_Paulo': 'BRL', 'Asia/Kolkata': 'INR'
+};
+
+const TIMEZONE_COUNTRY_MAP = {
+  'Africa/Douala': 'CM', 'Africa/Libreville': 'GA', 'Africa/Brazzaville': 'CG',
+  'Africa/Ndjamena': 'TD', 'Africa/Bangui': 'CF', 'Africa/Malabo': 'GQ',
+  'Africa/Abidjan': 'CI', 'Africa/Dakar': 'SN', 'Africa/Bamako': 'ML',
+  'Africa/Ouagadougou': 'BF', 'Africa/Cotonou': 'BJ', 'Africa/Lome': 'TG',
+  'Africa/Niamey': 'NE', 'Africa/Bissau': 'GW', 'Africa/Lagos': 'NG',
+  'Africa/Accra': 'GH', 'Africa/Kinshasa': 'CD', 'Africa/Lubumbashi': 'CD',
+  'Africa/Conakry': 'GN', 'Africa/Casablanca': 'MA', 'Africa/Algiers': 'DZ',
+  'Africa/Tunis': 'TN', 'Africa/Johannesburg': 'ZA',
+  'Europe/Paris': 'FR', 'Europe/Brussels': 'BE', 'Europe/Berlin': 'DE',
+  'Europe/Madrid': 'ES', 'Europe/Rome': 'IT', 'Europe/Lisbon': 'PT',
+  'Europe/Amsterdam': 'NL', 'Europe/Vienna': 'AT', 'Europe/Dublin': 'IE',
+  'Europe/Luxembourg': 'LU', 'Europe/London': 'GB', 'Europe/Zurich': 'CH',
+  'America/Toronto': 'CA', 'America/Montreal': 'CA', 'America/Vancouver': 'CA',
+  'America/New_York': 'US', 'America/Chicago': 'US', 'America/Denver': 'US',
+  'America/Los_Angeles': 'US', 'America/Sao_Paulo': 'BR', 'Asia/Kolkata': 'IN',
+};
+
+const COUNTRY_MAP = {
+  'CM': { curr: 'XAF', flag: '🇨🇲', name: 'Cameroun' },
+  'GA': { curr: 'XAF', flag: '🇬🇦', name: 'Gabon' },
+  'CG': { curr: 'XAF', flag: '🇨🇬', name: 'Congo' },
+  'TD': { curr: 'XAF', flag: '🇹🇩', name: 'Tchad' },
+  'CF': { curr: 'XAF', flag: '🇨🇫', name: 'Centrafrique' },
+  'GQ': { curr: 'XAF', flag: '🇬🇶', name: 'Guinée Équatoriale' },
+  'CI': { curr: 'XOF', flag: '🇨🇮', name: 'Côte d\'Ivoire' },
+  'SN': { curr: 'XOF', flag: '🇸🇳', name: 'Sénégal' },
+  'ML': { curr: 'XOF', flag: '🇲🇱', name: 'Mali' },
+  'BF': { curr: 'XOF', flag: '🇧🇫', name: 'Burkina Faso' },
+  'BJ': { curr: 'XOF', flag: '🇧🇯', name: 'Bénin' },
+  'TG': { curr: 'XOF', flag: '🇹🇬', name: 'Togo' },
+  'NE': { curr: 'XOF', flag: '🇳🇪', name: 'Niger' },
+  'GW': { curr: 'XOF', flag: '🇬🇼', name: 'Guinée-Bissau' },
+  'FR': { curr: 'EUR', flag: '🇫🇷', name: 'France' },
+  'BE': { curr: 'EUR', flag: '🇧🇪', name: 'Belgique' },
+  'DE': { curr: 'EUR', flag: '🇩🇪', name: 'Allemagne' },
+  'ES': { curr: 'EUR', flag: '🇪🇸', name: 'Espagne' },
+  'IT': { curr: 'EUR', flag: '🇮🇹', name: 'Italie' },
+  'PT': { curr: 'EUR', flag: '🇵🇹', name: 'Portugal' },
+  'NL': { curr: 'EUR', flag: '🇳🇱', name: 'Pays-Bas' },
+  'AT': { curr: 'EUR', flag: '🇦🇹', name: 'Autriche' },
+  'LU': { curr: 'EUR', flag: '🇱🇺', name: 'Luxembourg' },
+  'US': { curr: 'USD', flag: '🇺🇸', name: 'États-Unis' },
+  'CA': { curr: 'CAD', flag: '🇨🇦', name: 'Canada' },
+  'GB': { curr: 'GBP', flag: '🇬🇧', name: 'Royaume-Uni' },
+  'NG': { curr: 'NGN', flag: '🇳🇬', name: 'Nigeria' },
+  'GH': { curr: 'GHS', flag: '🇬🇭', name: 'Ghana' },
+  'CD': { curr: 'CDF', flag: '🇨🇩', name: 'RD Congo' },
+  'MA': { curr: 'MAD', flag: '🇲🇦', name: 'Maroc' },
+  'DZ': { curr: 'DZD', flag: '🇩🇿', name: 'Algérie' },
+  'TN': { curr: 'TND', flag: '🇹🇳', name: 'Tunisie' },
+  'GN': { curr: 'GNF', flag: '🇬🇳', name: 'Guinée' },
+  'CH': { curr: 'CHF', flag: '🇨🇭', name: 'Suisse' },
+  'ZA': { curr: 'ZAR', flag: '🇿🇦', name: 'Afrique du Sud' },
+  'BR': { curr: 'BRL', flag: '🇧🇷', name: 'Brésil' },
+  'IN': { curr: 'INR', flag: '🇮🇳', name: 'Inde' },
+};
+
+let currentCurrency = 'XAF';
+let currentCountryName = 'Cameroun';
+let currentCountryFlag = '🇨🇲';
+let currentCountryCode = 'CM';
+let selectedPlan = 'monthly';
+
+// Windows (Chrome/Edge) n'a pas de police d'émojis drapeaux et affiche le
+// code pays dans une boîte (ex. "NG") au lieu du vrai drapeau. On utilise donc
+// une vraie image de drapeau (flagcdn.com), fiable sur tous les systèmes,
+// avec repli sur un globe si le code est inconnu ou l'image ne charge pas.
+function flagImgHtml(countryCode) {
+  if (!countryCode) return '🌍';
+  const cc = countryCode.toLowerCase();
+  return `<img src="https://flagcdn.com/24x18/${cc}.png" width="16" height="12" alt="${countryCode}" `
+    + `style="border-radius:2px;vertical-align:middle;display:inline-block" `
+    + `onerror="this.replaceWith(document.createTextNode('🌍'))">`;
+}
+const PLAN_PRICES_USD = { monthly: 1.5, halfyearly: 6, yearly: 10 };
+const LOCAL_RATES = { USD: 1, EUR: 0.92, XAF: 600, XOF: 600, NGN: 1600, GHS: 15, GBP: 0.79, CAD: 1.36, CHF: 0.90, MAD: 10, DZD: 135, TND: 3.1, GNF: 8600, CDF: 2800, ZAR: 18, BRL: 5, INR: 83 };
+
+const PLAN_MONTHS = { monthly: 1, halfyearly: 6, yearly: 12 };
+
+// Convertit un montant en dollars dans la devise du visiteur, prêt à afficher.
+function formatLocalPrice(usdAmount) {
+  const currency = currentCurrency in LOCAL_RATES ? currentCurrency : 'USD';
+  const raw = usdAmount * LOCAL_RATES[currency];
+  const decimalCurrency = ['USD', 'EUR', 'GBP', 'CAD', 'CHF'].includes(currency);
+  const amount = decimalCurrency ? Math.round(raw * 100) / 100 : Math.round(raw);
+  const formatted = new Intl.NumberFormat(lang === 'fr' ? 'fr-FR' : 'en-US', {
+    minimumFractionDigits: decimalCurrency ? 2 : 0,
+    maximumFractionDigits: decimalCurrency ? 2 : 0,
+  }).format(amount);
+  return { amount, formatted: `${formatted} ${CURRENCIES[currency]?.symbol || currency}` };
+}
+
+function getPlanPrice(plan) {
+  return formatLocalPrice(PLAN_PRICES_USD[plan]);
+}
+
+// Prix ramené au mois, et économie réelle par rapport à l'abonnement d'un mois
+// (calculés à partir des vrais tarifs : rien n'est écrit « en dur »).
+function getPlanPerMonth(plan) {
+  return formatLocalPrice(PLAN_PRICES_USD[plan] / PLAN_MONTHS[plan]).formatted;
+}
+function getPlanSavingPct(plan) {
+  return Math.round((1 - (PLAN_PRICES_USD[plan] / PLAN_MONTHS[plan]) / PLAN_PRICES_USD.monthly) * 100);
+}
+
+function selectPlan(plan) {
+  if (!PLAN_PRICES_USD[plan]) return;
+  selectedPlan = plan;
+  document.querySelectorAll('[data-plan-tab]').forEach(button => {
+    button.classList.toggle('active', button.dataset.planTab === plan);
+  });
+  updatePricingDisplay();
+}
+
+function initGeoCurrency() {
+  // Priorité absolue : un choix manuel explicite (voir setManualCountry) ne
+  // doit JAMAIS être recalculé automatiquement, quelle que soit la fiabilité
+  // du fuseau horaire ou de l'IP.
+  const savedCountry = localStorage.getItem('sl_user_country');
+  if (savedCountry && COUNTRY_MAP[savedCountry]) {
+    const item = COUNTRY_MAP[savedCountry];
+    currentCurrency = item.curr;
+    currentCountryName = item.name;
+    currentCountryFlag = item.flag;
+    currentCountryCode = savedCountry;
+    updatePricingDisplay();
+    return;
+  }
+
+  // Le fuseau horaire du navigateur (dérivé du système d'exploitation) est
+  // BEAUCOUP plus fiable que la géolocalisation par IP — surtout en Afrique,
+  // où les bases de données IP attribuent souvent des plages entières au
+  // mauvais pays voisin (ex. un utilisateur au Cameroun détecté comme au
+  // Nigeria). On ne consulte donc l'API IP (fetchGeoLocation) qu'en dernier
+  // recours, uniquement si le fuseau horaire n'a rien donné d'exploitable.
+  // Note : certains systèmes rapportent eux-mêmes le mauvais fuseau pour des
+  // pays voisins au même décalage horaire (Cameroun/Nigeria = UTC+1 tous les
+  // deux) — dans ce cas, seul le sélecteur manuel "Pas le bon pays ?" corrige
+  // durablement la détection.
+  let timezoneResolved = false;
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const timezoneCountry = TIMEZONE_COUNTRY_MAP[tz];
+    if (timezoneCountry && COUNTRY_MAP[timezoneCountry]) {
+      const item = COUNTRY_MAP[timezoneCountry];
+      currentCurrency = item.curr;
+      currentCountryName = item.name;
+      currentCountryFlag = item.flag;
+      currentCountryCode = timezoneCountry;
+      timezoneResolved = true;
+    } else if (tz && TIMEZONE_MAP[tz]) {
+      currentCurrency = TIMEZONE_MAP[tz];
+      for (const code in COUNTRY_MAP) {
+        if (COUNTRY_MAP[code].curr === currentCurrency) {
+          currentCountryName = COUNTRY_MAP[code].name;
+          currentCountryFlag = COUNTRY_MAP[code].flag;
+          currentCountryCode = code;
+          timezoneResolved = true;
+          break;
+        }
+      }
+    }
+  } catch {}
+
+  updatePricingDisplay();
+  if (!timezoneResolved) fetchGeoLocation();
+}
+
+/**
+ * Affiche/masque le sélecteur manuel de pays ("Pas le bon pays ?"), peuplé à
+ * la volée depuis COUNTRY_MAP au premier affichage.
+ */
+function toggleCountryPicker() {
+  const picker = document.getElementById('premCountryPicker');
+  if (!picker) return;
+  const opening = picker.style.display === 'none';
+  if (opening && picker.options.length <= 1) {
+    const codes = Object.keys(COUNTRY_MAP).sort((a, b) => COUNTRY_MAP[a].name.localeCompare(COUNTRY_MAP[b].name, 'fr'));
+    for (const code of codes) {
+      const opt = document.createElement('option');
+      opt.value = code;
+      opt.textContent = `${COUNTRY_MAP[code].name} (${COUNTRY_MAP[code].curr})`;
+      picker.appendChild(opt);
+    }
+  }
+  picker.style.display = opening ? 'block' : 'none';
+}
+
+/**
+ * Correction manuelle par l'utilisateur : prioritaire à vie sur la détection
+ * automatique (fuseau horaire / IP), mémorisée en localStorage.
+ */
+function setManualCountry(code) {
+  if (!code || !COUNTRY_MAP[code]) return;
+  const item = COUNTRY_MAP[code];
+  currentCurrency = item.curr;
+  currentCountryName = item.name;
+  currentCountryFlag = item.flag;
+  currentCountryCode = code;
+  localStorage.setItem('sl_user_country', code);
+  updatePricingDisplay();
+  const picker = document.getElementById('premCountryPicker');
+  if (picker) picker.style.display = 'none';
+}
+
+function applyDetectedCountry(countryCode, countryName) {
+  const code = String(countryCode || '').toUpperCase();
+  const item = COUNTRY_MAP[code];
+  if (!item) return false;
+  currentCurrency = item.curr;
+  currentCountryName = countryName || item.name;
+  currentCountryFlag = item.flag;
+  currentCountryCode = code;
+  updatePricingDisplay();
+  return true;
+}
+
+async function fetchGeoLocation() {
+  try {
+    const res = await fetch('https://ipapi.co/json/').catch(() => null);
+    if (res && res.ok) {
+      const data = await res.json();
+      if (data.country_code && COUNTRY_MAP[data.country_code]) {
+        applyDetectedCountry(data.country_code, data.country_name);
+        updatePricingDisplay();
+        return;
+      }
+      if (data.currency && CURRENCIES[data.currency]) {
+        currentCurrency = data.currency;
+        currentCountryName = data.country_name || currentCurrency;
+        currentCountryFlag = '🌍';
+        currentCountryCode = null;
+        updatePricingDisplay();
+      }
+    }
+  } catch {}
+}
+
+function updatePricingDisplay() {
+  document.querySelectorAll('[data-plan-price]').forEach(element => {
+    element.textContent = getPlanPrice(element.dataset.planPrice).formatted;
+  });
+
+  const freePrice = document.getElementById('homePriceFree');
+  if (freePrice) {
+    const freeCurrency = currentCurrency in LOCAL_RATES ? currentCurrency : 'USD';
+    freePrice.textContent = `0 ${CURRENCIES[freeCurrency]?.symbol || freeCurrency}`;
+  }
+
+  const startingPrice = document.querySelector('.premium-starting-price');
+  if (startingPrice) startingPrice.textContent = getPlanPrice('monthly').formatted;
+
+  const selected = getPlanPrice(selectedPlan);
+  const premVal = document.getElementById('premPriceVal');
+  const premUnit = document.getElementById('premPriceUnit');
+  const premApprox = document.getElementById('premPriceApprox');
+  const premBtnLabel = document.getElementById('premBtnLabel');
+  const premGeoFlag = document.getElementById('premGeoFlag');
+  const premGeoCountry = document.getElementById('premGeoCountry');
+  const premPriceSub = document.getElementById('premPriceSub');
+  const numberEnd = selected.formatted.lastIndexOf(' ');
+
+  if (premVal) premVal.textContent = numberEnd > 0 ? selected.formatted.slice(0, numberEnd) : selected.formatted;
+  if (premUnit) premUnit.textContent = numberEnd > 0 ? selected.formatted.slice(numberEnd + 1) : currentCurrency;
+  if (premApprox) premApprox.textContent = `≈ ${PLAN_PRICES_USD[selectedPlan].toFixed(2)} USD`;
+  if (premBtnLabel) premBtnLabel.textContent = `Payer maintenant ${selected.formatted}`;
+  if (premPriceSub) {
+    const perMonth = getPlanPerMonth(selectedPlan);
+    premPriceSub.textContent = selectedPlan === 'yearly' ? `Abonnement d’un an · soit ${perMonth} / mois`
+      : selectedPlan === 'halfyearly' ? `Abonnement de 6 mois · soit ${perMonth} / mois`
+      : 'Abonnement d’un mois';
+  }
+
+  // Sélecteur de durée : prix au mois et économie réelle de chaque abonnement.
+  document.querySelectorAll('[data-plan-permonth]').forEach(el => {
+    el.textContent = getPlanPerMonth(el.dataset.planPermonth);
+  });
+  document.querySelectorAll('[data-plan-save]').forEach(el => {
+    el.textContent = `−${getPlanSavingPct(el.dataset.planSave)} %`;
+  });
+  const yearlyNote = document.getElementById('homeYearlyNote');
+  if (yearlyNote) {
+    yearlyNote.textContent = t('pp.yearNote')
+      .replace('{price}', getPlanPerMonth('yearly'))
+      .replace('{pct}', getPlanSavingPct('yearly'));
+  }
+  if (premGeoFlag) premGeoFlag.innerHTML = flagImgHtml(currentCountryCode);
+  if (premGeoCountry) premGeoCountry.textContent = `Détecté : ${currentCountryName}`;
+}
+
+/* ─── Paiement GeniusPay ─────────────────────────────────────────── */
+
+async function doPremium() {
+  if (!currentUser) { openModal('register'); return; }
+
+  const btn   = document.getElementById('premBtn');
+  const errEl = document.getElementById('premErr');
+  const okEl  = document.getElementById('premOk');
+  const cfg   = getPlanPrice(selectedPlan);
+
+  const cgvCheck = document.getElementById('premCgvCheck');
+  if (cgvCheck && !cgvCheck.checked) {
+    errEl.textContent = 'Tu dois accepter les CGV et CGU pour continuer.';
+    errEl.style.display = 'block';
+    cgvCheck.focus();
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span> Préparation du paiement…';
+  errEl.style.display = 'none';
+  okEl.style.display  = 'none';
+
+  try {
+    const r = await fetch('/api/payment/initiate', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        provider: 'geniuspay',
+        currency: currentCurrency,
+        plan: selectedPlan
+      })
+    });
+    const d = await r.json();
+
+    if (!r.ok) {
+      errEl.textContent = d.error || 'Impossible d\'initier le paiement. Vérifie la configuration.';
+      errEl.style.display = 'block';
+      btn.disabled = false;
+      btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span id="premBtnLabel">Payer maintenant ${cfg.formatted}</span>`;
+      return;
+    }
+
+    sessionStorage.setItem('sl_tx', d.transaction_id);
+    if (d.payment_url) {
+      window.location.href = d.payment_url;
+    } else {
+      okEl.textContent = 'Paiement initié avec succès !';
+      okEl.style.display = 'block';
+    }
+
+  } catch (e) {
+    errEl.textContent = 'Erreur réseau : ' + e.message;
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span id="premBtnLabel">Payer maintenant ${cfg.formatted}</span>`;
+  }
+}
+
+async function reloadUser() {
+  if (!token) return;
+  try {
+    const r = await fetch('/api/auth/me', { headers: { 'Authorization': 'Bearer ' + token } });
+    const d = await r.json();
+    if (d.user) {
+      currentUser = d.user;
+      updateNavUser();
+    }
+  } catch {}
+}
+
+(async () => {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('premium') === 'success') {
+    window.history.replaceState({}, '', '/');
+    await reloadUser();
+    setTimeout(() => {
+      if (currentUser?.plan === 'premium') {
+        openModal('profile');
+        showStatus('Ton compte Premium est activé. Bienvenue !', 'success');
+      }
+    }, 400);
+  }
+})();
+
+/* ─── Analyze ────────────────────────────────────────────────────── */
+let selQuality = '1080p';
+let currentInfo = null;
+
+// ── Sous-titres : état du toggle & langue choisie ───────────────
+let withSubtitles = false;
+let subtitleLang = 'fr';
+const subtitleOptsEl = document.getElementById('subtitleOpts');
+const subtitleToggleEl = document.getElementById('subtitleToggle');
+const subtitleLangWrapEl = document.getElementById('subtitleLangWrap');
+const subtitleLangSel = document.getElementById('subtitleLang');
+subtitleToggleEl.addEventListener('change', () => {
+  withSubtitles = subtitleToggleEl.checked;
+  subtitleLangWrapEl.style.display = withSubtitles ? 'flex' : 'none';
+});
+subtitleLangSel.addEventListener('change', () => {
+  subtitleLang = subtitleLangSel.value;
+});
+
+// ── Découpage vidéo sur mesure : état du toggle & essais gratuits ──
+let wantsTrim = false;
+const trimToggleEl = document.getElementById('trimToggle');
+const trimToggleWrapEl = document.getElementById('trimToggleWrap');
+const trimFieldsWrapEl = document.getElementById('trimFieldsWrap');
+const trimTrialsBadgeEl = document.getElementById('trimTrialsBadge');
+const trimStartEl = document.getElementById('trimStart');
+const trimEndEl = document.getElementById('trimEnd');
+
+function trimLimitReached() {
+  return !!currentUser && currentUser.plan !== 'premium' && (currentUser.trim_trials_used || 0) >= 3;
+}
+
+function updateTrimUI() {
+  const isPremium = currentUser?.plan === 'premium';
+  const locked = trimLimitReached();
+
+  if (isPremium || !currentUser) {
+    trimTrialsBadgeEl.style.display = 'none';
+  } else {
+    const used = currentUser.trim_trials_used || 0;
+    const remaining = Math.max(0, 3 - used);
+    trimTrialsBadgeEl.textContent = `${remaining}/3 essais restants`;
+    trimTrialsBadgeEl.classList.toggle('limit-reached', remaining === 0);
+    trimTrialsBadgeEl.style.display = 'inline-block';
+  }
+
+  trimToggleWrapEl.classList.toggle('locked', locked);
+  if (locked && trimToggleEl.checked) {
+    trimToggleEl.checked = false;
+    wantsTrim = false;
+    trimFieldsWrapEl.classList.remove('open');
+  }
+}
+
+// Un clic alors que le quota est épuisé doit ouvrir la modale Premium
+// AVANT que la case ne bascule (preventDefault empêche le changement d'état).
+trimToggleEl.addEventListener('click', (e) => {
+  if (trimLimitReached()) {
+    e.preventDefault();
+    openModal('premium');
+    showStatus('Tu as utilisé tes 3 essais gratuits de découpage vidéo. Passe au Premium pour un découpage illimité.', 'info');
+  }
+});
+
+trimToggleEl.addEventListener('change', () => {
+  if (trimLimitReached()) { trimToggleEl.checked = false; return; }
+  wantsTrim = trimToggleEl.checked;
+  trimFieldsWrapEl.classList.toggle('open', wantsTrim);
+});
+
+async function analyzeUrl() {
+  const url = document.getElementById('urlInput').value.trim();
+  if (!url) { showStatus(t('st.no_url'), 'error'); return; }
+  if (playlistRun) stopPlaylist(); // une nouvelle analyse interrompt la playlist en cours
+
+  const btn = document.getElementById('analyzeBtn');
+  btn.disabled = true;
+  btn.innerHTML = `<span class="spin"></span><span>${t('st.analyzing')}</span>`;
+  showStatus(t('st.analyzing'), 'info');
+
+  try {
+    const headers = token ? {'Authorization':'Bearer '+token} : {};
+    const r = await fetch('/api/analyze?url='+encodeURIComponent(url), { headers });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || t('st.err'));
+    if (d.playlist) {
+      // Lien de playlist : fiche dédiée (liste des vidéos) à la place de la fiche vidéo.
+      currentInfo = null;
+      document.getElementById('videoCard').classList.remove('show');
+      renderPlaylist(d.playlist);
+      showStatus(t('pl.found').replace('{n}', d.playlist.entries.length), 'success');
+    } else {
+      currentPlaylist = null;
+      document.getElementById('playlistCard').classList.remove('show');
+      currentInfo = d.data;
+      renderCard(d.data);
+      showStatus(`${d.data.formats.length} ${t('st.ready')}`, 'success');
+    }
+  } catch (e) {
+    showStatus(t('st.err') + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><span>${t('hero.analyze')}</span>`;
+  }
+}
+
+function renderCard(info) {
+  const img = document.getElementById('thumbImg');
+  const ph  = document.getElementById('thumbPlaceholder');
+  const dur = document.getElementById('thumbDuration');
+  if (info.thumbnail) {
+    img.src = info.thumbnail;
+    img.style.display = '';
+    ph.style.display = 'none';
+    img.onerror = () => { img.style.display='none'; ph.style.display='flex'; };
+  } else {
+    img.style.display='none'; ph.style.display='flex';
+  }
+  if (info.duration) {
+    const h=Math.floor(info.duration/3600), m=Math.floor((info.duration%3600)/60), s=info.duration%60;
+    dur.textContent = h ? `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}` : `${m}:${String(s).padStart(2,'0')}`;
+    dur.style.display='';
+  } else { dur.style.display='none'; }
+
+  document.getElementById('vcTitle').textContent = info.title.slice(0,90)+(info.title.length>90?'…':'');
+
+  const meta = document.getElementById('vcMeta');
+  meta.innerHTML = '';
+  const chips = [
+    {i:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>`, v: info.extractor},
+    info.duration ? {i:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`, v: fmtDur(info.duration)} : null,
+    {i:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`, v: info.uploader.slice(0,24)},
+    {i:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>`, v: info.formats.length+' formats'},
+  ].filter(Boolean);
+  chips.forEach(c => appendMetaChip(meta, c.i, c.v));
+
+  // Vidéo issue d'une playlist YouTube : proposer d'ouvrir la playlist entière.
+  videoPlaylistUrl = info.playlistUrl || null;
+  document.getElementById('vcPlaylistHint').style.display = videoPlaylistUrl ? '' : 'none';
+
+  // Cartes de formats et résolutions exactes
+  const fmts = document.getElementById('vcFmts');
+  fmts.innerHTML = '';
+  const isUserPremium = currentUser && currentUser.plan === 'premium';
+
+  const presets = [
+    {
+      id: '4k',
+      i: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',
+      t: '4K Ultra HD',
+      badge: 'Premium',
+      sub: '2160p ou 1440p',
+      premium: true,
+      q: '4k'
+    },
+    {
+      id: '1080p',
+      i: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="15" rx="2"/><polyline points="17 2 12 7 7 2"/></svg>',
+      t: '1080p Full HD',
+      badge: '',
+      sub: 'Haute définition',
+      premium: false,
+      q: '1080p'
+    },
+    {
+      id: '720p',
+      i: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>',
+      t: '720p HD',
+      badge: '',
+      sub: 'Plus léger, plus rapide',
+      premium: false,
+      q: '720p'
+    },
+    {
+      id: '480p',
+      i: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M10 9l5 3-5 3z"/></svg>',
+      t: '480p SD',
+      badge: '',
+      sub: 'Économie de données',
+      premium: false,
+      q: '480p'
+    },
+    {
+      id: 'mp3',
+      i: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>',
+      t: 'Audio MP3',
+      badge: '',
+      sub: 'Son uniquement, haute qualité',
+      premium: false,
+      q: 'mp3'
+    },
+  ];
+
+  // Par défaut sélectionner 1080p (ou 4K si premium)
+  const defaultIdx = isUserPremium ? 0 : 1;
+  selQuality = presets[defaultIdx].q;
+  
+  presets.forEach((p, i) => {
+    const btn = document.createElement('button');
+    const isLocked = p.premium && !isUserPremium;
+    btn.className = 'fmt-card' + (i === defaultIdx ? ' sel' : '') + (isLocked ? ' locked' : '');
+    
+    const badgeHtml = p.badge ? `<span class="fmt-badge-prem">${p.badge}</span>` : '';
+    btn.innerHTML = `
+      <div class="fmt-icon">${p.i}</div>
+      <div class="fmt-info">
+        <div class="fmt-t"><span>${p.t}</span>${badgeHtml}</div>
+        <div class="fmt-sub">${p.sub}</div>
+      </div>
+    `;
+
+    btn.onclick = () => {
+      if (p.premium && !isUserPremium) {
+        openModal('premium');
+        showStatus('La 4K est réservée aux abonnés Premium.', 'info');
+        return;
+      }
+      selQuality = p.q;
+      fmts.querySelectorAll('.fmt-card').forEach(b => b.classList.remove('sel'));
+      btn.classList.add('sel');
+      // Sous-titres : masquer l'option pour l'audio MP3, sinon l'afficher
+      subtitleOptsEl.style.display = p.q === 'mp3' ? 'none' : 'block';
+      if (p.q === 'mp3') {
+        withSubtitles = false;
+        subtitleToggleEl.checked = false;
+        subtitleLangWrapEl.style.display = 'none';
+      }
+    };
+    fmts.appendChild(btn);
+  });
+
+  document.getElementById('progressWrap').classList.remove('show');
+  document.getElementById('progressFill').style.width='0%';
+  document.getElementById('progressPct').textContent='';
+
+  if (isDev) {
+    const simBtn = document.getElementById('simBtn');
+    if (simBtn) simBtn.style.display = 'flex';
+  }
+
+  // Réinitialiser l'option sous-titres pour cette vidéo
+  withSubtitles = false;
+  subtitleToggleEl.checked = false;
+  subtitleLangSel.value = 'fr';
+  subtitleLangWrapEl.style.display = 'none';
+  subtitleOptsEl.style.display = selQuality === 'mp3' ? 'none' : 'block';
+
+  // Réinitialiser l'option de découpage vidéo pour cette vidéo
+  wantsTrim = false;
+  trimToggleEl.checked = false;
+  trimFieldsWrapEl.classList.remove('open');
+  trimStartEl.value = '';
+  trimEndEl.value = '';
+  updateTrimUI();
+
+  document.getElementById('videoCard').classList.add('show');
+  document.getElementById('videoCard').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function fmtDur(s) {
+  const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),ss=s%60;
+  return h?`${h}:${String(m).padStart(2,'0')}:${String(ss).padStart(2,'0')}`:`${m}:${String(ss).padStart(2,'0')}`;
+}
+
+// Pastille « icône + texte ». Le texte vient de la plateforme (titre, nom de
+// chaîne…) : il est inséré comme texte brut, jamais comme HTML.
+function appendMetaChip(container, iconSvg, text) {
+  const div = document.createElement('div');
+  div.className = 'meta-chip';
+  div.innerHTML = iconSvg;
+  const span = document.createElement('span');
+  span.textContent = text;
+  div.appendChild(span);
+  container.appendChild(div);
+}
+
+/* ─── Playlists ──────────────────────────────────────────────────── */
+// Les vidéos d'une playlist sont téléchargées une par une : chacune passe par
+// le circuit normal (file d'attente, limites) et arrive comme un fichier séparé.
+let currentPlaylist = null;   // { title, webpage, entries: [{ title, duration, url, selected, state, li }], access, … }
+let playlistRun = null;       // téléchargement en cours : { stop, es, abort }
+let plQuality = '1080p';
+let videoPlaylistUrl = null;  // playlist à laquelle appartient la vidéo affichée
+
+const PL_QUALITIES = [
+  { q: '1080p', label: '1080p' },
+  { q: '720p',  label: '720p' },
+  { q: '480p',  label: '480p' },
+  { q: 'mp3',   label: 'MP3' },
+  { q: '4k',    label: '4K', premium: true },
+];
+
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+const tpl = (key, vars = {}) => Object.entries(vars).reduce((s, [k, v]) => s.split(`{${k}}`).join(v), t(key));
+
+function openPlaylistFromVideo() {
+  if (!videoPlaylistUrl) return;
+  document.getElementById('urlInput').value = videoPlaylistUrl;
+  analyzeUrl();
+}
+
+function renderPlaylist(pl, { scroll = true } = {}) {
+  const isPremium = currentUser?.plan === 'premium';
+  // Le nombre de vidéos autorisé dépend du forfait au moment de l'affichage.
+  const maxItems = isPremium ? pl.limits.premium : pl.limits.free;
+  currentPlaylist = { ...pl, raw: pl, maxItems, entries: pl.entries.map((e, i) => ({ ...e, selected: i < maxItems, state: 'idle' })) };
+
+  document.getElementById('plTitle').textContent = pl.title.slice(0, 120);
+  const meta = document.getElementById('plMeta');
+  meta.innerHTML = '';
+  if (pl.uploader) appendMetaChip(meta, `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`, pl.uploader.slice(0, 40));
+  appendMetaChip(meta, `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>`, tpl('pl.videos', { n: pl.total }));
+  const totalSec = pl.entries.reduce((sum, e) => sum + (e.duration || 0), 0);
+  if (totalSec) appendMetaChip(meta, `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`, fmtDur(totalSec));
+
+  // Qualité commune à toute la playlist
+  if (plQuality === '4k' && !isPremium) plQuality = '1080p';
+  const qBox = document.getElementById('plQuality');
+  qBox.innerHTML = '';
+  PL_QUALITIES.forEach(opt => {
+    const locked = opt.premium && !isPremium;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'pl-q' + (opt.q === plQuality ? ' sel' : '') + (locked ? ' locked' : '');
+    btn.dataset.q = opt.q;
+    btn.textContent = opt.label;
+    if (opt.premium) {
+      const badge = document.createElement('span');
+      badge.className = 'fmt-badge-prem';
+      badge.textContent = 'Premium';
+      btn.appendChild(badge);
+    }
+    btn.onclick = () => {
+      if (locked) { openModal('premium'); showStatus(t('pl.fourK'), 'info'); return; }
+      plQuality = opt.q;
+      qBox.querySelectorAll('.pl-q').forEach(b => b.classList.toggle('sel', b.dataset.q === plQuality));
+    };
+    qBox.appendChild(btn);
+  });
+
+  // Liste des vidéos
+  const list = document.getElementById('plList');
+  list.innerHTML = '';
+  currentPlaylist.entries.forEach((entry, i) => {
+    const li = document.createElement('li');
+    li.className = 'pl-item';
+    const label = document.createElement('label');
+    label.className = 'pl-check';
+    const box = document.createElement('input');
+    box.type = 'checkbox';
+    box.checked = entry.selected;
+    box.onchange = () => togglePlaylistItem(entry, box);
+    const idx = document.createElement('span');
+    idx.className = 'pl-idx';
+    idx.textContent = i + 1;
+    const title = document.createElement('span');
+    title.className = 'pl-item-title';
+    title.textContent = entry.title;
+    title.title = entry.title;
+    label.append(box, idx, title);
+    const side = document.createElement('span');
+    side.className = 'pl-item-side';
+    li.append(label, side);
+    list.appendChild(li);
+    entry.li = li; entry.box = box; entry.side = side;
+    setPlaylistItemState(entry, 'idle');
+  });
+
+  updatePlaylistNote();
+  updatePlaylistSelection();
+  setPlaylistRunning(false);
+  const card = document.getElementById('playlistCard');
+  card.classList.add('show');
+  if (scroll) card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// Message sous la liste : ce à quoi le visiteur a droit, et ce qui a été écarté.
+function updatePlaylistNote() {
+  const pl = currentPlaylist;
+  if (!pl) return;
+  const isPremium = currentUser?.plan === 'premium';
+  const parts = [];
+  if (isPremium) {
+    parts.push(tpl('pl.notePremium', { max: pl.limits.premium }));
+  } else if (!currentUser) {
+    parts.push(tpl('pl.noteGuest', { max: pl.limits.free }));
+  } else if (pl.access && pl.access.reason === 'PLAYLIST_LIMIT_REACHED') {
+    const next = pl.access.nextAt ? new Date(pl.access.nextAt.replace(' ', 'T') + 'Z').toLocaleDateString(lang) : '';
+    parts.push(tpl('pl.noteLimit', { date: next }));
+  } else {
+    parts.push(tpl('pl.noteFree', { max: pl.limits.free }));
+  }
+  if (pl.total > pl.entries.length + pl.unavailable) parts.push(tpl('pl.noteTruncated', { total: pl.total, shown: pl.entries.length }));
+  if (pl.unavailable) parts.push(tpl('pl.noteUnavailable', { n: pl.unavailable }));
+  parts.push(t('pl.noteMulti'));
+  document.getElementById('plNote').textContent = parts.join(' ');
+}
+
+function togglePlaylistItem(entry, box) {
+  const pl = currentPlaylist;
+  if (box.checked && pl.entries.filter(e => e.selected).length >= pl.maxItems) {
+    box.checked = false;
+    showStatus(tpl('pl.maxReached', { max: pl.maxItems }), 'info');
+    return;
+  }
+  entry.selected = box.checked;
+  updatePlaylistSelection();
+}
+
+function togglePlaylistAll(checked) {
+  const pl = currentPlaylist;
+  if (!pl) return;
+  let kept = 0;
+  pl.entries.forEach(e => {
+    e.selected = checked && kept < pl.maxItems;
+    if (e.selected) kept += 1;
+    e.box.checked = e.selected;
+  });
+  updatePlaylistSelection();
+}
+
+function updatePlaylistSelection() {
+  const pl = currentPlaylist;
+  if (!pl) return;
+  const n = pl.entries.filter(e => e.selected).length;
+  pl.entries.forEach(e => e.li.classList.toggle('off', !e.selected));
+  document.getElementById('plCount').textContent = tpl('pl.count', { n, total: pl.entries.length });
+  document.getElementById('plSelectAll').checked = n > 0 && n === Math.min(pl.entries.length, pl.maxItems);
+  document.getElementById('plStartLabel').textContent = tpl('pl.start', { n });
+  document.getElementById('plStartBtn').disabled = n === 0 || Boolean(playlistRun);
+}
+
+function setPlaylistItemState(entry, state, detail) {
+  entry.state = state;
+  entry.li.classList.remove('running', 'done', 'error');
+  if (state !== 'idle') entry.li.classList.add(state);
+  entry.side.title = state === 'error' ? (detail || '') : '';
+  entry.side.textContent =
+    state === 'running' ? (detail || '…') :
+    state === 'done' ? t('pl.itemDone') :
+    state === 'error' ? t('pl.itemError') :
+    (entry.duration ? fmtDur(entry.duration) : '');
+}
+
+function setPlaylistRunning(running) {
+  const pl = currentPlaylist;
+  document.getElementById('plStopBtn').style.display = running ? '' : 'none';
+  document.getElementById('plSelectAll').disabled = running;
+  document.querySelectorAll('#plQuality .pl-q').forEach(b => { b.disabled = running; });
+  if (pl) pl.entries.forEach(e => { e.box.disabled = running; });
+  if (!running) document.getElementById('plProgressWrap').classList.remove('show');
+  updatePlaylistSelection();
+}
+
+function startPlaylistFromButton() {
+  const pl = currentPlaylist;
+  if (!pl || playlistRun) return;
+  const isPremium = currentUser?.plan === 'premium';
+  // Vérifications immédiates côté page (le serveur revérifie de toute façon).
+  if (!isPremium && !currentUser) {
+    openModal('register');
+    showStatus(tpl('pl.noteGuest', { max: pl.limits.free }), 'info');
+    return;
+  }
+  if (!isPremium) window.open('/api/ad-click', '_blank', 'noopener,noreferrer');
+  return startPlaylist();
+}
+
+async function startPlaylist() {
+  const pl = currentPlaylist;
+  const items = pl.entries.filter(e => e.selected);
+  if (!items.length) return;
+
+  // Droits et quota hebdomadaire : c'est le serveur qui décide.
+  let r, d;
+  try {
+    r = await fetch('/api/playlist/start', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
+      body: JSON.stringify({ url: pl.webpage, count: items.length }),
+    });
+    d = await r.json();
+  } catch (e) {
+    showStatus(t('st.err') + e.message, 'error');
+    return;
+  }
+  if (!r.ok) {
+    if (d.code === 'LOGIN_REQUIRED') openModal('register');
+    if (d.code === 'PLAYLIST_LIMIT_REACHED') openModal('premium');
+    showStatus(d.error || t('dl.err'), 'error');
+    return;
+  }
+
+  const run = playlistRun = { stop: false, es: null, abort: null };
+  items.forEach(e => setPlaylistItemState(e, 'idle'));
+  setPlaylistRunning(true);
+  const lbl = document.getElementById('plProgressLbl');
+  const pct = document.getElementById('plProgressPct');
+  const fill = document.getElementById('plProgressFill');
+  const detail = document.getElementById('plProgressDetail');
+  const list = document.getElementById('plList');
+  document.getElementById('plProgressWrap').classList.add('show');
+  fill.style.background = 'var(--accent)';
+
+  let done = 0, failed = 0, fatalMessage = null;
+  for (let i = 0; i < items.length && !run.stop; i++) {
+    const entry = items[i];
+    const showOverall = (itemPercent, note) => {
+      const overall = (i + itemPercent / 100) / items.length * 100;
+      fill.style.width = overall + '%';
+      pct.textContent = Math.floor(overall) + '%';
+      lbl.textContent = tpl('pl.progress', { i: i + 1, n: items.length, title: entry.title.slice(0, 60) });
+      detail.textContent = note || '';
+      setPlaylistItemState(entry, 'running', note && itemPercent === 0 ? '…' : Math.floor(itemPercent) + ' %');
+    };
+    showOverall(0, t('pl.preparing'));
+    list.scrollTop = Math.max(0, entry.li.offsetTop - 90);
+    try {
+      await downloadPlaylistItem(entry, plQuality, run, showOverall);
+      setPlaylistItemState(entry, 'done');
+      done += 1;
+      await sleep(1200); // laisse le navigateur démarrer l'enregistrement du fichier
+    } catch (err) {
+      if (run.stop) { setPlaylistItemState(entry, 'idle'); break; }
+      setPlaylistItemState(entry, 'error', err.message);
+      failed += 1;
+      if (err.fatal) { fatalMessage = err.message; break; }
+    }
+  }
+
+  const stopped = run.stop;
+  playlistRun = null;
+  setPlaylistRunning(false);
+  if (fatalMessage) {
+    showStatus(fatalMessage, 'error');
+  } else {
+    const key = stopped ? 'pl.stopped' : failed ? 'pl.finishedWithErrors' : 'pl.finished';
+    showStatus(tpl(key, { done, failed }), failed ? 'info' : 'success');
+  }
+}
+
+function stopPlaylist() {
+  const run = playlistRun;
+  if (!run) return;
+  run.stop = true;
+  if (run.es) { run.es.close(); run.es = null; }
+  if (run.abort) run.abort();
+}
+
+// Télécharge une vidéo de la playlist ; résout quand le fichier est parti vers l'appareil.
+function downloadPlaylistItem(entry, quality, run, onProgress) {
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    const fail = (message, fatal = false) => {
+      if (settled) return;
+      settled = true;
+      const err = new Error(message);
+      err.fatal = fatal;
+      reject(err);
+    };
+    run.abort = () => fail('stopped');
+
+    (async () => {
+      // 1. Lancer le téléchargement. Le serveur limite le nombre de lancements par
+      //    minute : dans ce cas on patiente puis on réessaie, sans échec.
+      let r, data;
+      for (let attempt = 0; ; attempt++) {
+        if (run.stop) return fail('stopped');
+        try {
+          r = await fetch('/api/download/start', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
+            body: JSON.stringify({ url: entry.url, quality, title: entry.title }),
+          });
+          data = await r.json();
+        } catch (e) {
+          return fail(t('pl.netErr'));
+        }
+        if (r.status === 429 && !data.code && attempt < 6) {
+          onProgress(0, t('pl.pacing'));
+          await sleep(12000);
+          continue;
+        }
+        break;
+      }
+      if (!r.ok) {
+        // Limite du compte ou serveur saturé : inutile d'essayer les vidéos suivantes.
+        const fatal = r.status === 429 || ['DAILY_LIMIT_REACHED', 'SERVER_BUSY', 'PREMIUM_REQUIRED'].includes(data.code);
+        return fail(data.error || t('dl.err'), fatal);
+      }
+
+      // 2. Suivre la progression en direct.
+      const jobId = data.jobId;
+      let attempts = 0;
+      const open = () => {
+        if (settled || run.stop) return;
+        const es = run.es = new EventSource(`/api/progress/${jobId}${token ? '?token=' + encodeURIComponent(token) : ''}`);
+        es.onmessage = (event) => {
+          attempts = 0;
+          const msg = JSON.parse(event.data);
+          if (msg.type === 'queued') {
+            onProgress(0, tpl('pl.queued', { pos: msg.position || '…' }));
+          } else if (msg.type === 'progress') {
+            onProgress(Math.min(99, msg.percent || 0), [msg.total, msg.speed].filter(Boolean).join(' · '));
+          } else if (msg.type === 'processing') {
+            onProgress(99, t('pl.finalizing'));
+          } else if (msg.type === 'done') {
+            es.close(); run.es = null;
+            const a = document.createElement('a');
+            a.href = `/api/file/${msg.jobId}${token ? '?token=' + encodeURIComponent(token) : ''}`;
+            a.download = `${msg.title || 'video'}.${msg.ext || 'mp4'}`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            if (!settled) { settled = true; resolve(); }
+          } else if (msg.type === 'error') {
+            es.close(); run.es = null;
+            fail(msg.message || t('dl.err'));
+          }
+        };
+        es.onerror = () => {
+          es.close(); run.es = null;
+          if (settled || run.stop) return;
+          // Onglet en arrière-plan (mobile) : on attend son retour plutôt que d'abandonner.
+          if (document.visibilityState !== 'visible') {
+            document.addEventListener('visibilitychange', function back() {
+              if (document.visibilityState !== 'visible') return;
+              document.removeEventListener('visibilitychange', back);
+              open();
+            });
+            return;
+          }
+          if (++attempts > 10) return fail(t('pl.netErr'));
+          setTimeout(open, 3000);
+        };
+      };
+      open();
+    })();
+  });
+}
+
+// Fermer la page pendant une playlist interromprait les téléchargements restants.
+window.addEventListener('beforeunload', (event) => {
+  if (!playlistRun) return;
+  event.preventDefault();
+  event.returnValue = '';
+});
+
+/* ─── Download ───────────────────────────────────────────────────── */
+let activeEventSource = null;
+let activeDownloadJobId = null;
+
+function startDownloadFromButton() {
+  if (currentUser?.plan !== 'premium') {
+    window.open('/api/ad-click', '_blank', 'noopener,noreferrer');
+  }
+  return startDownload();
+}
+
+async function startDownload() {
+  const url = document.getElementById('urlInput').value.trim();
+  if (!url || !currentInfo) return;
+
+  const isUserPremium = currentUser && currentUser.plan === 'premium';
+  if (selQuality === '4k' && !isUserPremium) {
+    openModal('premium');
+    showStatus('La 4K est réservée aux abonnés Premium.', 'info');
+    return;
+  }
+
+  // Découpage vidéo sur mesure : validation du format avant l'envoi
+  const TRIM_TIME_RE = /^\d{1,2}(:\d{2}){1,2}$/;
+  let trimStartVal = null, trimEndVal = null;
+  if (wantsTrim) {
+    trimStartVal = trimStartEl.value.trim();
+    trimEndVal = trimEndEl.value.trim();
+    if (!TRIM_TIME_RE.test(trimStartVal) || !TRIM_TIME_RE.test(trimEndVal)) {
+      showStatus('Format de temps invalide. Utilise MM:SS (ex : 00:10).', 'error');
+      return;
+    }
+    if (!currentUser) {
+      openModal('register');
+      showStatus('Crée un compte gratuit pour utiliser le découpage vidéo sur mesure.', 'info');
+      return;
+    }
+  }
+
+  if (activeEventSource) {
+    activeEventSource.close();
+    activeEventSource = null;
+  }
+
+  const pw    = document.getElementById('progressWrap');
+  const fill  = document.getElementById('progressFill');
+  const pct   = document.getElementById('progressPct');
+  const lbl   = document.getElementById('progressLbl');
+  const total = document.getElementById('progressTotal');
+  const speed = document.getElementById('progressSpeed');
+  const eta   = document.getElementById('progressEta');
+  const dlBtn = document.getElementById('dlBtn');
+
+  pw.classList.add('show');
+  fill.style.width  = '0%';
+  fill.style.background = 'var(--accent)';
+  pct.textContent   = '0%';
+  lbl.textContent   = 'Préparation du téléchargement…';
+  total.textContent = '';
+  speed.textContent = '';
+  eta.textContent   = '';
+  dlBtn.disabled    = true;
+
+  try {
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+
+    const r = await fetch('/api/download/start', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        url,
+        quality: selQuality,
+        title:   currentInfo?.title || 'video',
+        ...(withSubtitles ? { sublang: subtitleLang } : {}),
+        ...(wantsTrim ? { trim: true, startTime: trimStartVal, endTime: trimEndVal } : {}),
+      }),
+    });
+
+    const data = await r.json();
+
+    if (!r.ok) {
+      if (data.code === 'PREMIUM_REQUIRED' || data.code === 'TRIM_LIMIT_REACHED') {
+        openModal('premium');
+      }
+      if (data.code === 'SUBTITLE_LIMIT_REACHED') {
+        openModal('premium');
+      }
+      if (data.code === 'LOGIN_REQUIRED') {
+        openModal('register');
+      }
+      showStatus(data.error || 'Erreur lors du démarrage du téléchargement.', 'error');
+      pw.classList.remove('show');
+      dlBtn.disabled = false;
+      return;
+    }
+
+    // Un essai gratuit vient d'être consommé côté serveur : rafraîchir le badge.
+    if (wantsTrim && currentUser && currentUser.plan !== 'premium') {
+      await reloadUser();
+    }
+
+    const { jobId } = data;
+    lbl.textContent = 'Téléchargement & conversion universelle…';
+
+    const workingLabel = lbl.textContent;
+    activeDownloadJobId = jobId;
+    let finished = false;
+    let failedAttempts = 0;
+
+    const finish = () => {
+      finished = true;
+      document.removeEventListener('visibilitychange', onVisible);
+      if (activeEventSource) { activeEventSource.close(); activeEventSource = null; }
+    };
+
+    // Sur mobile, un onglet en arrière-plan peut perdre sa connexion : on se
+    // reconnecte dès qu'il redevient visible, sans perdre sa place dans la file.
+    const onVisible = () => {
+      if (document.visibilityState === 'visible' && !finished && !activeEventSource) connect();
+    };
+    document.addEventListener('visibilitychange', onVisible);
+
+    const onMessage = (event) => {
+      failedAttempts = 0;
+      const msg = JSON.parse(event.data);
+
+      if (msg.type === 'queued') {
+        fill.style.width = '0%';
+        pct.textContent  = '';
+        lbl.textContent  = `Serveur très sollicité — en file d'attente (position ${msg.position || '…'}). Ton téléchargement démarrera automatiquement.`;
+        speed.textContent = '';
+        eta.textContent   = '';
+
+      } else if (msg.type === 'progress') {
+        lbl.textContent = workingLabel;
+        const p = Math.min(99, msg.percent || 0);
+        fill.style.width  = p + '%';
+        pct.textContent   = p.toFixed(1) + '%';
+        if (msg.total) total.textContent = '' + msg.total;
+        if (msg.speed) speed.textContent = '' + msg.speed;
+        if (msg.eta)   eta.textContent   = 'Reste ' + msg.eta;
+
+      } else if (msg.type === 'processing') {
+        fill.style.width = '99%';
+        pct.textContent = '99%';
+        lbl.textContent = msg.message || 'Conversion finale…';
+        speed.textContent = '';
+        eta.textContent = '';
+
+      } else if (msg.type === 'done') {
+        finish();
+
+        fill.style.width  = '100%';
+        pct.textContent   = '100%';
+        lbl.textContent   = 'Préparation du fichier…';
+        if (msg.finalSize) total.textContent = '' + formatFileSize(msg.finalSize);
+        speed.textContent = '';
+        eta.textContent   = '';
+        fill.style.background = 'var(--success)';
+
+        const a = document.createElement('a');
+        a.href     = `/api/file/${msg.jobId}${token ? '?token=' + encodeURIComponent(token) : ''}`;
+        a.download = `${msg.title || 'video'}.${msg.ext || 'mp4'}`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        setTimeout(() => {
+          lbl.textContent = '' + (t('dl.done') || 'Téléchargement terminé !');
+          dlBtn.disabled  = false;
+        }, 800);
+
+      } else if (msg.type === 'error') {
+        finish();
+        showDownloadError(msg.message || 'Erreur de téléchargement');
+      }
+    };
+
+    const showDownloadError = (message) => {
+      fill.style.width  = '100%';
+      fill.style.background = 'var(--error)';
+      pct.textContent   = '';
+      lbl.textContent   = '' + message;
+      speed.textContent = '';
+      eta.textContent   = '';
+      showStatus(message, 'error');
+      dlBtn.disabled = false;
+    };
+
+    // EventSource ne peut pas envoyer de header Authorization : le token
+    // (si connecté) passe donc en paramètre de requête pour que le serveur
+    // puisse vérifier que ce job lui appartient bien.
+    function connect() {
+      if (finished || activeDownloadJobId !== jobId) return;
+      activeEventSource = new EventSource(`/api/progress/${jobId}${token ? '?token=' + encodeURIComponent(token) : ''}`);
+      activeEventSource.onmessage = onMessage;
+      activeEventSource.onerror = () => {
+        if (activeEventSource) { activeEventSource.close(); activeEventSource = null; }
+        if (finished || activeDownloadJobId !== jobId) return;
+        failedAttempts += 1;
+        if (failedAttempts > 10) {
+          finish();
+          showDownloadError('Connexion perdue avec le serveur. Relance le téléchargement.');
+          return;
+        }
+        // Onglet caché : on attend son retour (onVisible) plutôt que d'insister.
+        if (document.visibilityState === 'visible') setTimeout(connect, 3000);
+      };
+    }
+    connect();
+
+  } catch (e) {
+    showStatus('Erreur réseau : ' + e.message, 'error');
+    pw.classList.remove('show');
+    dlBtn.disabled = false;
+  }
+}
+
+function formatFileSize(bytes) {
+  if (!Number.isFinite(bytes) || bytes <= 0) return '';
+  const units = ['B', 'KiB', 'MiB', 'GiB'];
+  let value = bytes;
+  let index = 0;
+  while (value >= 1024 && index < units.length - 1) {
+    value /= 1024;
+    index += 1;
+  }
+  return `${value.toFixed(value >= 100 ? 0 : 1)} ${units[index]}`;
+}
+
+function openBrowser() {
+  const url = document.getElementById('urlInput').value.trim();
+  if (url) window.open(url, '_blank');
+}
+
+/* ─── AJOUT : Simulation de téléchargement ──────────────────────── */
+function simulateDownload() {
+  if (!currentInfo) {
+      showStatus("Analysez d'abord une URL pour pouvoir simuler.", 'info');
+      return;
+  }
+
+  const pw    = document.getElementById('progressWrap');
+  const fill  = document.getElementById('progressFill');
+  const pct   = document.getElementById('progressPct');
+  const lbl   = document.getElementById('progressLbl');
+  const total = document.getElementById('progressTotal');
+  const speed = document.getElementById('progressSpeed');
+  const eta   = document.getElementById('progressEta');
+  const dlBtn = document.getElementById('dlBtn');
+  const simBtn = document.getElementById('simBtn');
+
+  pw.classList.add('show');
+  fill.style.width  = '0%';
+  fill.style.background = 'var(--accent)';
+  pct.textContent   = '0%';
+  lbl.textContent   = 'Simulation de téléchargement…';
+  total.textContent = '123.45 MiB'; // Donnée factice
+  speed.textContent = '';
+  eta.textContent   = '';
+  dlBtn.disabled    = true;
+  simBtn.disabled   = true;
+  
+  let progress = 0;
+  const interval = setInterval(() => {
+    progress += Math.random() * 5 + 2; // Incrémentation aléatoire
+    if (progress >= 100) {
+      progress = 100;
+      clearInterval(interval);
+      
+      fill.style.width  = '100%';
+      pct.textContent   = '100%';
+      lbl.textContent   = 'Simulation terminée.';
+      speed.textContent = '';
+      eta.textContent   = '';
+      fill.style.background = 'var(--success)';
+
+      setTimeout(() => { dlBtn.disabled = false; simBtn.disabled = false; }, 2000);
+    } else {
+      fill.style.width  = progress + '%';
+      pct.textContent   = progress.toFixed(1) + '%';
+      speed.textContent = `${(Math.random() * 3 + 2).toFixed(2)} MiB/s`;
+      eta.textContent   = `Reste 00:${String(Math.floor((100 - progress) / 4)).padStart(2, '0')}`;
+    }
+  }, 300);
+}
+
+/* ─── Status ─────────────────────────────────────────────────────── */
+function showStatus(msg, type='info') {
+  const icons = {
+    info: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`,
+    success: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`,
+    error: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`,
+  };
+  document.getElementById('status-area').innerHTML = `<div class="status-msg status-${type}">${icons[type]}<span>${msg}</span></div>`;
+  if (type!=='error') setTimeout(()=>{ document.getElementById('status-area').innerHTML=''; }, 6000);
+}
+
+/* ─── Enter key ──────────────────────────────────────────────────── */
+document.getElementById('urlInput').addEventListener('keypress', e => { if(e.key==='Enter') analyzeUrl(); });
+
+/* ─── Apparition au défilement (une seule fois) ──────────────────── */
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (!entry.isIntersecting) return;
+    entry.target.classList.add('in');
+    io.unobserve(entry.target);
+  });
+}, { rootMargin: '0px 0px -40px 0px', threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+/* ─── Motifs d'arrière-plan : léger effet de profondeur au défilement ── */
+const prlx = document.getElementById('prlxLayer');
+if (prlx && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  let prlxTicking = false;
+  window.addEventListener('scroll', () => {
+    if (prlxTicking) return;
+    prlxTicking = true;
+    requestAnimationFrame(() => {
+      prlx.style.transform = `translateY(${window.scrollY * -0.12}px)`;
+      prlxTicking = false;
+    });
+  }, { passive: true });
+}
+
+/* ─── Init ───────────────────────────────────────────────────────── */
+(async () => {
+  lang = detectLang();
+  applyI18n();
+  initGeoCurrency();
+  await loadUser();
+  if (!token) updateAdVisibility();
+})();
+</script>
+</body>
+</html>

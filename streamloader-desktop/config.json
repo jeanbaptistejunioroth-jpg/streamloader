@@ -1,0 +1,13 @@
+{
+  "serverUrl": "https://back.streamloaders.net",
+  "siteUrl": "https://streamloaders.net",
+  "premiumPath": "/#pricing",
+  "routes": {
+    "analyze": "/api/media/analyze",
+    "downloadStart": "/api/media/download/start",
+    "progress": "/api/media/progress/",
+    "file": "/api/media/file/",
+    "playlistStart": "/api/playlist/start"
+  },
+  "mode": "server"
+}

@@ -1,0 +1,66 @@
+{
+  "name": "streamloader",
+  "productName": "StreamLoader",
+  "version": "1.0.0",
+  "description": "StreamLoader pour Windows — application réservée aux abonnés Premium",
+  "author": "StreamLoader",
+  "main": "main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "dist": "node build.js all",
+    "dist:server": "node build.js server",
+    "dist:local": "node build.js local"
+  },
+  "devDependencies": {
+    "electron": "45.1.0",
+    "electron-builder": "26.18.0"
+  },
+  "build": {
+    "appId": "app.streamloader.desktop",
+    "productName": "StreamLoader",
+    "copyright": "© StreamLoader",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "local.js",
+      "config.json",
+      "src/**/*"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": false,
+      "createStartMenuShortcut": true,
+      "shortcutName": "StreamLoader",
+      "runAfterFinish": true,
+      "installerIcon": "build/installer.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "installerHeaderIcon": "build/installer.ico",
+      "uninstallDisplayName": "StreamLoader",
+      "language": "1036",
+      "installerLanguages": [
+        "fr_FR"
+      ],
+      "multiLanguageInstaller": false,
+      "include": "build/installer.nsh",
+      "deleteAppDataOnUninstall": false,
+      "installerHeader": "build/installerHeader.bmp"
+    },
+    "electronLanguages": [
+      "fr",
+      "en-US"
+    ],
+    "compression": "normal"
+  }
+}
