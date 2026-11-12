@@ -1,0 +1,12 @@
+.env
+.env.*
+!.env.example
+node_modules
+data
+tmp
+*.db
+*.db-*
+*.log
+streamloader-desktop
+geniuspay-woocommerce (1)
+deploy

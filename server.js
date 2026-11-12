@@ -294,6 +294,12 @@ app.use((req, res, next) => {
   next();
 });
 
+// Mode vitrine (SHOWCASE_MODE=1, défini uniquement sur l'hébergement de démo) :
+// accueil + pages légales visibles, tout le reste bloqué. Sans la variable,
+// ce middleware n'est pas enregistré et le site reste 100 % fonctionnel.
+const showcase = require('./showcase');
+if (showcase.isShowcase()) app.use(showcase.showcaseGuard);
+
 app.use(express.json({
   limit: '10kb',
   verify: (req, _res, buf) => { req.rawBody = Buffer.from(buf); },
